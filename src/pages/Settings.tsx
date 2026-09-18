@@ -6,7 +6,7 @@ import { Download, Trash2, User, Moon, Sun, Monitor, Save, Edit3, CheckCircle2 }
 import { useNavigate } from 'react-router-dom';
 
 export function Settings() {
-  const { user, dbUser, updateDbUser, logOut } = useAuth();
+  const { user, dbUser, updateDbUser, logOut, deleteAccountAndData } = useAuth();
   const navigate = useNavigate();
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,15 +57,22 @@ export function Settings() {
     }
   };
 
-  const handleDeleteData = async () => {
+  const handleDeleteAccountAndData = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      await dbApi.deleteAllUserData();
-      await logOut();
+      if (deleteAccountAndData) {
+        await deleteAccountAndData();
+      } else {
+        if (user.uid && user.uid !== 'admin-user' && user.uid !== 'student-user') {
+          await dbApi.deleteUserAccountAndData(user.uid);
+        }
+        await logOut();
+      }
       navigate('/login');
     } catch (err) {
-      console.error(err);
+      console.error('Account and data deletion failed:', err);
+      alert('Failed to delete account and data. Please check your network connection and try again.');
       setLoading(false);
     }
   };
@@ -262,23 +269,69 @@ export function Settings() {
           </div>
           
           <div className="pt-6 border-t border-white/10">
-            <h3 className="font-medium text-red-400 mb-2">Danger Zone</h3>
-            <p className="text-sm text-white/60 mb-4">Permanently delete all your academic data and profile. This action cannot be undone.</p>
+            <div className="flex items-center gap-2 text-red-400 mb-2">
+              <Trash2 className="w-5 h-5 text-red-400" />
+              <h3 className="font-semibold text-lg text-red-400">Danger Zone</h3>
+            </div>
+            <p className="text-sm text-white/60 mb-5 max-w-xl">
+              Permanently delete all your academic records, exam data, syllabus tracking, and profile from the database. This action cannot be undone.
+            </p>
             
             {!deleteConfirm ? (
-              <button onClick={() => setDeleteConfirm(true)} className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 transition-colors rounded-xl flex items-center gap-2 text-sm font-medium border border-red-500/30 w-max">
-                <Trash2 className="w-4 h-4" /> Delete My Academic Data
+              <button 
+                id="btn-delete-account"
+                type="button"
+                onClick={() => setDeleteConfirm(true)} 
+                className="px-5 py-3 bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-semibold transition-all rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-red-950/40 hover:shadow-red-900/50 cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" /> Delete My Data & Account
               </button>
             ) : (
-              <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl">
-                <p className="text-sm font-medium text-red-400 mb-4">Are you sure you want to delete your academic data? This will remove all records and log you out.</p>
-                <div className="flex gap-3 flex-wrap">
-                  <button onClick={handleDeleteData} disabled={loading} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white transition-colors rounded-xl text-sm font-bold">
-                    {loading ? 'Deleting...' : 'Yes, Delete Everything'}
-                  </button>
-                  <button onClick={() => setDeleteConfirm(false)} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white transition-colors rounded-xl text-sm font-medium">
-                    Cancel
-                  </button>
+              <div id="delete-account-confirmation" className="bg-red-500/10 border border-red-500/30 p-5 rounded-2xl animate-in fade-in duration-200 max-w-2xl">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-red-500/20 text-red-400 shrink-0 mt-0.5">
+                    <Trash2 className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-base font-bold text-red-400 mb-1">
+                      Are you sure? This action is irreversible and will delete all your academic records.
+                    </h4>
+                    <p className="text-sm text-white/70 mb-4 leading-relaxed">
+                      This will permanently delete your user document from Firestore (<code className="text-red-300 font-mono text-xs">users/{user?.uid || 'current'}</code>), erase all your exams, study logs, and syllabus progress, remove your name from the Admin directory, and sign you out.
+                      <br /><br />
+                      If you log in with this Google account in the future, you will be treated as a brand new student and prompted to complete onboarding again.
+                    </p>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <button 
+                        id="btn-confirm-delete-account"
+                        type="button"
+                        onClick={handleDeleteAccountAndData} 
+                        disabled={loading} 
+                        className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white transition-all rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-red-950/50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading ? (
+                          <>
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Deleting Account & Data...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="w-4 h-4" />
+                            Yes, Delete My Data & Account
+                          </>
+                        )}
+                      </button>
+                      <button 
+                        id="btn-cancel-delete-account"
+                        type="button"
+                        onClick={() => setDeleteConfirm(false)} 
+                        disabled={loading}
+                        className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white transition-colors rounded-xl text-sm font-medium cursor-pointer disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

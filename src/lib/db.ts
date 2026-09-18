@@ -1,5 +1,5 @@
 import { db, auth } from './firebase';
-import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 
 export interface SyllabusProgress {
   id: string;
@@ -207,10 +207,10 @@ export const dbApi = {
           group: initialGroup,
           createdAt: initialCreatedAt,
           exams: [],
-          syllabusProgress: localData.syllabusProgress || [],
-          studySessions: localData.studySessions || [],
-          goals: localData.goals || [],
-          calculatorState: localCalcState || localData.calculatorState || null,
+          syllabusProgress: [],
+          studySessions: [],
+          goals: [],
+          calculatorState: null,
           updatedAt: Date.now()
         };
 
@@ -220,9 +220,9 @@ export const dbApi = {
           createdAt: initialCreatedAt,
           updatedAt: Date.now(),
           exams: [],
-          syllabusProgress: initialData.syllabusProgress,
-          studySessions: initialData.studySessions,
-          goals: initialData.goals
+          syllabusProgress: [],
+          studySessions: [],
+          goals: []
         };
         if (initialClass) firestorePayload.class = initialClass;
         if (initialGroup) firestorePayload.group = initialGroup;
@@ -502,25 +502,29 @@ export const dbApi = {
     await syncFieldToFirestore('calculatorState', state);
   },
 
-  async deleteAllUserData() {
-    const effectiveUid = getEffectiveUid();
+  async deleteUserAccountAndData(uid?: string): Promise<void> {
+    const effectiveUid = getEffectiveUid(uid);
     localStorage.removeItem('profileData');
     localStorage.removeItem('hsc-tracker-storage');
+    localStorage.removeItem('student_user');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('current_uid');
+    localStorage.removeItem('is_admin');
 
-    if (effectiveUid) {
+    if (effectiveUid && effectiveUid !== 'admin-user' && effectiveUid !== 'student-user') {
       try {
-        await setDoc(doc(db, 'users', effectiveUid), {
-          exams: [],
-          syllabusProgress: [],
-          studySessions: [],
-          goals: [],
-          calculatorState: null,
-          updatedAt: Date.now()
-        }, { merge: true });
+        const userDocRef = doc(db, 'users', effectiveUid);
+        await deleteDoc(userDocRef);
+        console.log(`Successfully deleted user document from Firestore: users/${effectiveUid}`);
       } catch (e) {
-        console.warn('Failed to clear remote data in Firestore:', e);
+        console.error('Failed to delete user document in Firestore:', e);
+        throw e;
       }
     }
+  },
+
+  async deleteAllUserData() {
+    await this.deleteUserAccountAndData();
   },
 
   // Task 2 & Task 3: Fetch users for Admin Panel (Privacy compliant: ONLY Name, Email, Creation Date, Class)

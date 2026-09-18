@@ -6,6 +6,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useTrackerStore } from '../store/useTrackerStore';
 import { GroupType } from '../types';
+import { normalizeClass } from '../utils/formatters';
 
 export interface User {
   uid: string;
@@ -31,6 +32,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<boolean>;
   studentLogin: (data: DbUser) => Promise<boolean>;
   logOut: () => Promise<void>;
+  deleteAccountAndData: () => Promise<void>;
   isAdmin: boolean;
   adminLogin: (password: string) => Promise<boolean>;
   token: string | null;
@@ -40,7 +42,7 @@ interface AuthContextType {
 
 const checkOnboardingNeeded = (userProfile: { class?: string; group?: string } | null | undefined): boolean => {
   if (!userProfile) return true;
-  const hasClass = Boolean(userProfile.class && (userProfile.class === 'Class 11' || userProfile.class === 'Class 12' || userProfile.class === 'HSC Candidate'));
+  const hasClass = Boolean(normalizeClass(userProfile.class));
   const hasGroup = Boolean(userProfile.group && ['SCIENCE', 'ARTS', 'COMMERCE'].includes(userProfile.group.toUpperCase()));
   return !hasClass || !hasGroup;
 };
@@ -322,6 +324,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteAccountAndData = async () => {
+    const targetUid = user?.uid || auth.currentUser?.uid;
+
+    // 1. Immediately delete user document from Firestore users collection
+    if (targetUid && targetUid !== 'admin-user' && targetUid !== 'student-user') {
+      try {
+        await dbApi.deleteUserAccountAndData(targetUid);
+      } catch (err) {
+        console.error('Failed to delete document from Firestore users collection:', err);
+        throw err;
+      }
+    } else {
+      await dbApi.deleteUserAccountAndData();
+    }
+
+    // 2. Clear all local storage records
+    localStorage.removeItem('profileData');
+    localStorage.removeItem('hsc-tracker-storage');
+    localStorage.removeItem('student_user');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('current_uid');
+    localStorage.removeItem('is_admin');
+
+    // 3. Reset in-memory tracker state
+    useTrackerStore.getState().setGroup('SCIENCE');
+
+    // 4. Attempt to delete Firebase Auth user (graceful fallback if requires recent login)
+    if (auth.currentUser) {
+      try {
+        await auth.currentUser.delete();
+        console.log('Firebase Auth user deleted successfully');
+      } catch (authErr: any) {
+        console.warn('Firebase Auth user delete skipped or requires recent login, proceeding with signOut:', authErr);
+      }
+    }
+
+    // 5. Sign out from Firebase
+    try {
+      await logoutFirebase();
+    } catch (signOutErr) {
+      console.warn('Sign out warning:', signOutErr);
+    }
+
+    // 6. Reset context states
+    setUser(null);
+    setDbUser(null);
+    setToken(null);
+    setIsAdmin(false);
+    setNeedsOnboarding(false);
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -331,6 +384,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithGoogle,
       studentLogin,
       logOut,
+      deleteAccountAndData,
       isAdmin,
       adminLogin,
       token,
