@@ -10,6 +10,7 @@ import { StudyTime } from './pages/StudyTime';
 import { Goals } from './pages/Goals';
 import { StudyLab } from './pages/StudyLab';
 import { StudyLabTimer } from './pages/StudyLabTimer';
+import { StudyHub } from './pages/StudyHub';
 import { DailyTasks } from './pages/DailyTasks';
 import { EventTracker } from './pages/EventTracker';
 import { Leaderboard } from './pages/Leaderboard';
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="syllabus" element={<SyllabusTracker />} />
             <Route path="study-time" element={<StudyTime />} />
             <Route path="study-lab" element={<StudyLab />} />
+            <Route path="study-hub" element={<StudyHub />} />
             <Route path="daily-tasks" element={<DailyTasks />} />
             <Route path="events" element={<EventTracker />} />
             <Route path="leaderboard" element={<Leaderboard />} />

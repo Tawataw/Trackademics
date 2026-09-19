@@ -109,6 +109,15 @@ export interface ExamRecord {
   status: string;
 }
 
+export interface StudyResource {
+  id: string;
+  uid: string;
+  platformName: string;
+  url: string;
+  createdAt: number;
+  updatedAt?: number;
+}
+
 /**
  * Strict scoring formula: 60 minutes of study = 20 points
  * Formula: Points = Math.floor((totalStudyMinutes / 60) * 20)
@@ -1040,6 +1049,157 @@ export const dbApi = {
           },
           (fallbackErr) => {
             console.error('Failed to listen to studySubjects collection:', fallbackErr);
+            if (onError) onError(fallbackErr);
+          }
+        );
+        return fallbackUnsub;
+      }
+    );
+
+    return unsubscribe;
+  },
+
+  // ==================== STUDY HUB (studyResources) ====================
+  async addStudyResource(uid: string, data: { platformName: string; url: string }): Promise<string> {
+    const effectiveUid = getEffectiveUid(uid);
+    if (!effectiveUid) throw new Error('User not authenticated');
+    try {
+      const subCol = collection(db, 'users', effectiveUid, 'studyResources');
+      const docRef = await addDoc(subCol, {
+        uid: effectiveUid,
+        platformName: data.platformName.trim(),
+        url: data.url.trim(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      return docRef.id;
+    } catch (err) {
+      console.error('Failed to add study resource in Firestore:', err);
+      throw err;
+    }
+  },
+
+  async updateStudyResource(uid: string, resourceId: string, data: { platformName: string; url: string }): Promise<void> {
+    const effectiveUid = getEffectiveUid(uid);
+    if (!effectiveUid) throw new Error('User not authenticated');
+    try {
+      const docRef = doc(db, 'users', effectiveUid, 'studyResources', resourceId);
+      await updateDoc(docRef, {
+        platformName: data.platformName.trim(),
+        url: data.url.trim(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (err) {
+      console.error('Failed to update study resource in Firestore:', err);
+      throw err;
+    }
+  },
+
+  async deleteStudyResource(uid: string, resourceId: string): Promise<void> {
+    const effectiveUid = getEffectiveUid(uid);
+    if (!effectiveUid) throw new Error('User not authenticated');
+    try {
+      const docRef = doc(db, 'users', effectiveUid, 'studyResources', resourceId);
+      await deleteDoc(docRef);
+    } catch (err) {
+      console.error('Failed to delete study resource in Firestore:', err);
+      throw err;
+    }
+  },
+
+  async getStudyResources(uid: string): Promise<StudyResource[]> {
+    const effectiveUid = getEffectiveUid(uid);
+    if (!effectiveUid) return [];
+    try {
+      const subCol = collection(db, 'users', effectiveUid, 'studyResources');
+      const snap = await getDocs(subCol);
+      const list: StudyResource[] = [];
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        const rawCreated = data.createdAt;
+        let createdAtMs = Date.now();
+        if (rawCreated?.toMillis) {
+          createdAtMs = rawCreated.toMillis();
+        } else if (rawCreated?.seconds) {
+          createdAtMs = rawCreated.seconds * 1000;
+        } else if (typeof rawCreated === 'number') {
+          createdAtMs = rawCreated;
+        }
+
+        list.push({
+          id: docSnap.id,
+          uid: data.uid || effectiveUid,
+          platformName: data.platformName || 'Resource',
+          url: data.url || '',
+          createdAt: createdAtMs,
+          updatedAt: data.updatedAt?.toMillis ? data.updatedAt.toMillis() : (data.updatedAt?.seconds ? data.updatedAt.seconds * 1000 : data.updatedAt)
+        });
+      });
+      list.sort((a, b) => b.createdAt - a.createdAt);
+      return list;
+    } catch (err) {
+      console.error('Failed to fetch study resources:', err);
+      return [];
+    }
+  },
+
+  subscribeToStudyResources(
+    uid: string,
+    onData: (resources: StudyResource[]) => void,
+    onError?: (error: any) => void
+  ): () => void {
+    const effectiveUid = getEffectiveUid(uid);
+    if (!effectiveUid) {
+      onData([]);
+      return () => {};
+    }
+
+    const subCol = collection(db, 'users', effectiveUid, 'studyResources');
+    const q = query(subCol, orderBy('createdAt', 'desc'));
+
+    const mapDocs = (snapshot: any): StudyResource[] => {
+      const list: StudyResource[] = [];
+      snapshot.forEach((docSnap: any) => {
+        const data = docSnap.data();
+        const rawCreated = data.createdAt;
+        let createdAtMs = Date.now();
+        if (rawCreated?.toMillis) {
+          createdAtMs = rawCreated.toMillis();
+        } else if (rawCreated?.seconds) {
+          createdAtMs = rawCreated.seconds * 1000;
+        } else if (typeof rawCreated === 'number') {
+          createdAtMs = rawCreated;
+        }
+
+        list.push({
+          id: docSnap.id,
+          uid: data.uid || effectiveUid,
+          platformName: data.platformName || 'Resource',
+          url: data.url || '',
+          createdAt: createdAtMs,
+          updatedAt: data.updatedAt?.toMillis ? data.updatedAt.toMillis() : (data.updatedAt?.seconds ? data.updatedAt.seconds * 1000 : data.updatedAt)
+        });
+      });
+      return list;
+    };
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const list = mapDocs(snapshot);
+        onData(list);
+      },
+      (err) => {
+        console.warn('orderBy("createdAt", "desc") on studyResources query error, falling back to unordered listener:', err);
+        const fallbackUnsub = onSnapshot(
+          subCol,
+          (snapshot) => {
+            const list = mapDocs(snapshot);
+            list.sort((a, b) => b.createdAt - a.createdAt);
+            onData(list);
+          },
+          (fallbackErr) => {
+            console.error('Failed to listen to studyResources collection:', fallbackErr);
             if (onError) onError(fallbackErr);
           }
         );
