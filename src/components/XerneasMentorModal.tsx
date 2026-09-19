@@ -182,7 +182,7 @@ export function XerneasMentorModal() {
     try {
       // Task 2: Implement Native REST API Call using browser fetch
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: {
@@ -281,7 +281,7 @@ export function XerneasMentorModal() {
     try {
       // Task 2: Native REST API Call using browser fetch
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: {
