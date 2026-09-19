@@ -6,6 +6,33 @@ const __dirname = process.cwd();
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+app.use(express.json());
+
+// API route for Xerneas AI Mentor
+app.post('/api/gemini/mentor', async (req, res) => {
+  try {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(400).json({ error: 'GEMINI_API_KEY is not configured.' });
+    }
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ error: 'Prompt is required.' });
+    }
+
+    const { GoogleGenerativeAI } = await import('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    // Specify model gemini-1.5-flash-latest
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    return res.json({ text });
+  } catch (err: any) {
+    console.error('Gemini mentor server error:', err);
+    return res.status(500).json({ error: err.message || 'Failed to generate mentor feedback' });
+  }
+});
+
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

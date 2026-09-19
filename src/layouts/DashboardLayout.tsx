@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { OnboardingModal } from '../components/OnboardingModal';
+import { XerneasMentorModal } from '../components/XerneasMentorModal';
 import { formatClassName, formatGroupName } from '../utils/formatters';
 import { 
   LayoutDashboard, 
@@ -148,6 +149,9 @@ export function DashboardLayout() {
             <Outlet />
          </div>
       </main>
+
+      {/* Xerneas AI Floating Action Button and Slide-Out Mentor Modal */}
+      <XerneasMentorModal />
     </div>
   );
 }
