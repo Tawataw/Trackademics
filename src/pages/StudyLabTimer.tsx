@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { StudySubject } from '../lib/db';
+import { useAuth } from '../contexts/AuthContext';
+import { dbApi, StudySession, StudySubject } from '../lib/db';
 import { getColorMeta, StudySessionMode } from './StudyLab';
 import { Play, Pause, Square } from 'lucide-react';
 
@@ -12,6 +13,7 @@ interface SessionLocationState {
 }
 
 export function StudyLabTimer() {
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -174,8 +176,26 @@ export function StudyLabTimer() {
   }, [preStartCount, isExamSprint]);
 
   // Task 4: End session handler
-  const handleEndSession = () => {
+  const handleEndSession = async () => {
     const totalStudied = !isExamSprint ? elapsedSeconds : totalFocusSeconds;
+    const studyMinutes = Math.round(totalStudied / 60);
+
+    // Save session & update totalStudyMinutes and studyPoints in Firestore
+    if (user && studyMinutes > 0) {
+      try {
+        const session: StudySession = {
+          id: `${user.uid}_${Date.now()}`,
+          uid: user.uid,
+          date: Date.now(),
+          durationMinutes: studyMinutes,
+          createdAt: Date.now()
+        };
+        await dbApi.saveStudySession(session);
+        await dbApi.addStudyMinutes(user.uid, studyMinutes);
+      } catch (err) {
+        console.warn('Failed to save study session on timer completion:', err);
+      }
+    }
     
     // Clean up stored session
     try {

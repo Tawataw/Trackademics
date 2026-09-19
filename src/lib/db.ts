@@ -36,6 +36,16 @@ export interface DailyTasksDoc {
   updatedAt: number;
 }
 
+export interface EventItem {
+  id: string;
+  name: string;
+  date: string; // YYYY-MM-DD
+  time?: string; // HH:mm
+  location?: string;
+  notes?: string;
+  createdAt: number;
+}
+
 export interface FeedbackRecord {
   id: string;
   userId: string;
@@ -99,6 +109,25 @@ export interface ExamRecord {
   status: string;
 }
 
+/**
+ * Strict scoring formula: 60 minutes of study = 20 points
+ * Formula: Points = Math.floor((totalStudyMinutes / 60) * 20)
+ */
+export function calculateStudyPoints(totalStudyMinutes: number): number {
+  if (!totalStudyMinutes || totalStudyMinutes <= 0) return 0;
+  return Math.floor((totalStudyMinutes / 60) * 20);
+}
+
+/**
+ * Converts total study minutes into human-readable format like "12h 30m" or "0h 0m"
+ */
+export function formatStudyTime(totalMinutes?: number): string {
+  const mins = Math.max(0, Math.floor(Number(totalMinutes) || 0));
+  const hours = Math.floor(mins / 60);
+  const remainingMinutes = mins % 60;
+  return `${hours}h ${remainingMinutes}m`;
+}
+
 export interface UserProfileData {
   name?: string;
   class?: string;
@@ -107,6 +136,8 @@ export interface UserProfileData {
   email?: string;
   uid?: string;
   createdAt?: number;
+  studyPoints?: number;
+  totalStudyMinutes?: number;
   syllabusProgress?: SyllabusProgress[];
   studySessions?: StudySession[];
   goals?: Goal[];
@@ -219,6 +250,10 @@ export const dbApi = {
         const resolvedCollege = remote.collegeName || initialProfile?.collegeName || localData.collegeName || '';
         const resolvedCreatedAt = remote.createdAt || initialProfile?.createdAt || remote.updatedAt || Date.now();
 
+        const sessionMins = mergedSessions.reduce((acc: number, s: any) => acc + (Number(s.durationMinutes) || 0), 0);
+        const totalMinutes = Math.max(Number(remote.totalStudyMinutes) || 0, sessionMins);
+        const calculatedPoints = calculateStudyPoints(totalMinutes);
+
         const updatedLocal: UserProfileData = {
           ...localData,
           name: resolvedName,
@@ -228,6 +263,8 @@ export const dbApi = {
           email: resolvedEmail,
           createdAt: resolvedCreatedAt,
           uid,
+          totalStudyMinutes: totalMinutes,
+          studyPoints: calculatedPoints,
           syllabusProgress: mergedSyllabus,
           studySessions: mergedSessions,
           goals: mergedGoals,
@@ -242,6 +279,8 @@ export const dbApi = {
           name: resolvedName,
           email: resolvedEmail,
           createdAt: resolvedCreatedAt,
+          totalStudyMinutes: totalMinutes,
+          studyPoints: calculatedPoints,
           updatedAt: Date.now(),
           ...(resolvedClass ? { class: resolvedClass } : {}),
           ...(resolvedGroup ? { group: resolvedGroup } : {}),
@@ -267,6 +306,8 @@ export const dbApi = {
           group: initialGroup,
           collegeName: initialCollege,
           createdAt: initialCreatedAt,
+          totalStudyMinutes: 0,
+          studyPoints: 0,
           exams: [],
           syllabusProgress: [],
           studySessions: [],
@@ -279,6 +320,8 @@ export const dbApi = {
           name: initialData.name,
           email: initialData.email,
           createdAt: initialCreatedAt,
+          totalStudyMinutes: 0,
+          studyPoints: 0,
           updatedAt: Date.now(),
           exams: [],
           syllabusProgress: [],
@@ -299,13 +342,15 @@ export const dbApi = {
     }
   },
 
-  async updateUserProfile(uid: string, profile: { name?: string; class?: string; group?: string; collegeName?: string }): Promise<UserProfileData> {
+  async updateUserProfile(uid: string, profile: { name?: string; class?: string; group?: string; collegeName?: string; totalStudyMinutes?: number; studyPoints?: number }): Promise<UserProfileData> {
     const effectiveUid = getEffectiveUid(uid);
     const current = getProfileData();
     if (profile.name !== undefined) current.name = profile.name;
     if (profile.class !== undefined) current.class = profile.class;
     if (profile.group !== undefined) current.group = profile.group;
     if (profile.collegeName !== undefined) current.collegeName = profile.collegeName;
+    if (profile.totalStudyMinutes !== undefined) current.totalStudyMinutes = profile.totalStudyMinutes;
+    if (profile.studyPoints !== undefined) current.studyPoints = profile.studyPoints;
     current.updatedAt = Date.now();
     saveProfileData(current);
 
@@ -319,6 +364,8 @@ export const dbApi = {
         if (profile.class !== undefined) updatePayload.class = profile.class;
         if (profile.group !== undefined) updatePayload.group = profile.group;
         if (profile.collegeName !== undefined) updatePayload.collegeName = profile.collegeName;
+        if (profile.totalStudyMinutes !== undefined) updatePayload.totalStudyMinutes = profile.totalStudyMinutes;
+        if (profile.studyPoints !== undefined) updatePayload.studyPoints = profile.studyPoints;
 
         await setDoc(userDocRef, updatePayload, { merge: true });
       } catch (err) {
@@ -393,6 +440,184 @@ export const dbApi = {
     saveProfileData(data);
 
     await syncFieldToFirestore('studySessions', list, session.uid);
+  },
+
+  /**
+   * Adds study minutes to the user's totalStudyMinutes in Firestore users/{uid},
+   * calculates studyPoints using Math.floor((totalStudyMinutes / 60) * 20),
+   * and synchronizes local storage caches immediately.
+   */
+  async addStudyMinutes(uid: string, minutesToAdd: number): Promise<{ totalStudyMinutes: number; studyPoints: number }> {
+    const effectiveUid = getEffectiveUid(uid);
+    let currentMinutes = 0;
+
+    if (effectiveUid) {
+      try {
+        const userDocRef = doc(db, 'users', effectiveUid);
+        const snap = await getDoc(userDocRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (typeof data.totalStudyMinutes === 'number') {
+            currentMinutes = data.totalStudyMinutes;
+          } else if (Array.isArray(data.studySessions)) {
+            currentMinutes = data.studySessions.reduce((acc: number, s: any) => acc + (Number(s.durationMinutes) || 0), 0);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to query existing totalStudyMinutes from Firestore, falling back:', err);
+      }
+    }
+
+    if (!currentMinutes) {
+      const local = getProfileData();
+      currentMinutes = Number(local.totalStudyMinutes) || (
+        Array.isArray(local.studySessions)
+          ? local.studySessions.reduce((acc, s) => acc + (Number(s.durationMinutes) || 0), 0)
+          : 0
+      );
+    }
+
+    const newTotalMinutes = Math.max(0, currentMinutes + minutesToAdd);
+    const newStudyPoints = calculateStudyPoints(newTotalMinutes);
+
+    // Update in Firestore users/{uid}
+    if (effectiveUid) {
+      try {
+        const userDocRef = doc(db, 'users', effectiveUid);
+        await setDoc(userDocRef, {
+          totalStudyMinutes: newTotalMinutes,
+          studyPoints: newStudyPoints,
+          updatedAt: Date.now()
+        }, { merge: true });
+      } catch (err) {
+        console.warn('Failed to update totalStudyMinutes and studyPoints in Firestore:', err);
+      }
+    }
+
+    // Update local profile data
+    const local = getProfileData();
+    local.totalStudyMinutes = newTotalMinutes;
+    local.studyPoints = newStudyPoints;
+    saveProfileData(local);
+
+    // Update student_user in localStorage if present
+    try {
+      const stored = localStorage.getItem('student_user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        parsed.totalStudyMinutes = newTotalMinutes;
+        parsed.studyPoints = newStudyPoints;
+        localStorage.setItem('student_user', JSON.stringify(parsed));
+      }
+    } catch (e) {}
+
+    return { totalStudyMinutes: newTotalMinutes, studyPoints: newStudyPoints };
+  },
+
+  /**
+   * Retroactive Data Sync Fix:
+   * Checks if totalStudyMinutes in the users/{uid} document matches the actual total
+   * time from the user's study logs (both Firestore and local storage).
+   * If missing, 0, or out of sync, recalculates total minutes, writes totalStudyMinutes,
+   * and forcefully recalculates studyPoints using Math.floor((totalStudyMinutes / 60) * 20) in Firestore.
+   */
+  async syncUserStudyTimeAndPoints(uid: string): Promise<{ totalStudyMinutes: number; studyPoints: number }> {
+    const effectiveUid = getEffectiveUid(uid);
+    const local = getProfileData();
+    const localSessions: StudySession[] = Array.isArray(local.studySessions) ? local.studySessions : [];
+    
+    let remoteSessions: StudySession[] = [];
+    let remoteTotalMinutes = 0;
+    let remoteStudyPoints = 0;
+    let remoteExists = false;
+
+    if (effectiveUid) {
+      try {
+        const userDocRef = doc(db, 'users', effectiveUid);
+        const snap = await getDoc(userDocRef);
+        if (snap.exists()) {
+          remoteExists = true;
+          const data = snap.data();
+          if (Array.isArray(data.studySessions)) {
+            remoteSessions = data.studySessions;
+          }
+          if (typeof data.totalStudyMinutes === 'number') {
+            remoteTotalMinutes = Math.max(0, data.totalStudyMinutes);
+          }
+          if (typeof data.studyPoints === 'number') {
+            remoteStudyPoints = Math.max(0, data.studyPoints);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch user from Firestore in syncUserStudyTimeAndPoints:', err);
+      }
+    }
+
+    // Merge sessions from local and remote by unique key
+    const sessionMap = new Map<string, StudySession>();
+    localSessions.forEach((s) => {
+      if (s) {
+        const key = s.id || `${s.date || 0}_${s.durationMinutes || 0}`;
+        sessionMap.set(key, s);
+      }
+    });
+    remoteSessions.forEach((s) => {
+      if (s) {
+        const key = s.id || `${s.date || 0}_${s.durationMinutes || 0}`;
+        sessionMap.set(key, s);
+      }
+    });
+    const mergedSessions = Array.from(sessionMap.values());
+
+    // Calculate actual total study minutes from all logged sessions
+    const sessionsTotalMinutes = mergedSessions.reduce((acc, s) => {
+      return acc + (Math.max(0, Number(s.durationMinutes)) || 0);
+    }, 0);
+
+    const localTotalMinutes = Math.max(0, Number(local.totalStudyMinutes) || 0);
+
+    // True total study minutes is the maximum of session logs, remote record, and local record
+    const finalTotalMinutes = Math.max(sessionsTotalMinutes, remoteTotalMinutes, localTotalMinutes);
+    const finalStudyPoints = calculateStudyPoints(finalTotalMinutes);
+
+    // If out of sync in Firestore or local
+    const needsFirestoreUpdate = !remoteExists || (
+      remoteTotalMinutes !== finalTotalMinutes ||
+      remoteStudyPoints !== finalStudyPoints ||
+      (remoteSessions.length < mergedSessions.length)
+    );
+
+    if (effectiveUid && needsFirestoreUpdate) {
+      try {
+        const userDocRef = doc(db, 'users', effectiveUid);
+        await setDoc(userDocRef, {
+          totalStudyMinutes: finalTotalMinutes,
+          studyPoints: finalStudyPoints,
+          studySessions: mergedSessions,
+          updatedAt: Date.now()
+        }, { merge: true });
+      } catch (err) {
+        console.warn('Failed to update synced study time and points in Firestore:', err);
+      }
+    }
+
+    // Update local cache
+    local.studySessions = mergedSessions;
+    local.totalStudyMinutes = finalTotalMinutes;
+    local.studyPoints = finalStudyPoints;
+    saveProfileData(local);
+
+    try {
+      const stored = localStorage.getItem('student_user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        parsed.totalStudyMinutes = finalTotalMinutes;
+        parsed.studyPoints = finalStudyPoints;
+        localStorage.setItem('student_user', JSON.stringify(parsed));
+      }
+    } catch (e) {}
+
+    return { totalStudyMinutes: finalTotalMinutes, studyPoints: finalStudyPoints };
   },
 
   async getGoals(uid: string): Promise<Goal[]> {
@@ -1036,24 +1261,16 @@ export const dbApi = {
           createdAtMs = data.updatedAt;
         }
 
-        // Calculate study duration if recorded
-        let totalMinutes = 0;
-        if (Array.isArray(data.studySessions)) {
-          totalMinutes = data.studySessions.reduce((acc: number, s: any) => acc + (Number(s.durationMinutes) || 0), 0);
-        }
+        // Calculate study duration from recorded totalStudyMinutes and studySessions logs
+        const recordedMinutes = typeof data.totalStudyMinutes === 'number' ? Math.max(0, data.totalStudyMinutes) : 0;
+        const sessionMinutes = Array.isArray(data.studySessions)
+          ? data.studySessions.reduce((acc: number, s: any) => acc + (Math.max(0, Number(s.durationMinutes)) || 0), 0)
+          : 0;
+        const totalMinutes = Math.max(recordedMinutes, sessionMinutes);
 
-        // Dummy/actual study points
-        let points = 0;
-        if (typeof data.studyPoints === 'number' && data.studyPoints > 0) {
-          points = data.studyPoints;
-        } else if (totalMinutes > 0) {
-          points = totalMinutes * 10;
-        } else {
-          // Predictable initial study points derived from account recency
-          const daysOld = Math.max(1, Math.floor((Date.now() - createdAtMs) / (1000 * 60 * 60 * 24)));
-          points = Math.min(2500, Math.max(50, (daysOld * 45) + ((createdAtMs % 1000) / 10)));
-          points = Math.round(points);
-        }
+        // Strict scoring formula: 60 minutes of study = 20 points
+        // Formula: Points = Math.floor((totalStudyMinutes / 60) * 20)
+        const points = calculateStudyPoints(totalMinutes);
 
         userList.push({
           uid: docSnap.id,
@@ -1068,8 +1285,12 @@ export const dbApi = {
         });
       });
 
-      // Temporarily sort by creation date (newest first) as requested
-      return userList.sort((a, b) => b.createdAt - a.createdAt);
+      // Sort strictly by studyPoints in DESCENDING order (highest points = Rank 1)
+      return userList.sort((a, b) => {
+        if (b.studyPoints !== a.studyPoints) return b.studyPoints - a.studyPoints;
+        if (b.totalStudyMinutes !== a.totalStudyMinutes) return b.totalStudyMinutes - a.totalStudyMinutes;
+        return a.createdAt - b.createdAt;
+      });
     } catch (err) {
       console.error('Failed to fetch leaderboard users:', err);
       return [];
@@ -1122,21 +1343,15 @@ export const dbApi = {
             createdAtMs = data.updatedAt;
           }
 
-          let totalMinutes = 0;
-          if (Array.isArray(data.studySessions)) {
-            totalMinutes = data.studySessions.reduce((acc: number, s: any) => acc + (Number(s.durationMinutes) || 0), 0);
-          }
+          // Calculate study duration from recorded totalStudyMinutes and studySessions logs
+          const recordedMinutes = typeof data.totalStudyMinutes === 'number' ? Math.max(0, data.totalStudyMinutes) : 0;
+          const sessionMinutes = Array.isArray(data.studySessions)
+            ? data.studySessions.reduce((acc: number, s: any) => acc + (Math.max(0, Number(s.durationMinutes)) || 0), 0)
+            : 0;
+          const totalMinutes = Math.max(recordedMinutes, sessionMinutes);
 
-          let points = 0;
-          if (typeof data.studyPoints === 'number' && data.studyPoints > 0) {
-            points = data.studyPoints;
-          } else if (totalMinutes > 0) {
-            points = totalMinutes * 10;
-          } else {
-            const daysOld = Math.max(1, Math.floor((Date.now() - createdAtMs) / (1000 * 60 * 60 * 24)));
-            points = Math.min(2500, Math.max(50, (daysOld * 45) + ((createdAtMs % 1000) / 10)));
-            points = Math.round(points);
-          }
+          // Strict scoring formula: 60 minutes = 20 points
+          const points = calculateStudyPoints(totalMinutes);
 
           userList.push({
             uid: docSnap.id,
@@ -1151,11 +1366,160 @@ export const dbApi = {
           });
         });
 
-        userList.sort((a, b) => b.createdAt - a.createdAt);
+        // Sort strictly by studyPoints in DESCENDING order (highest points = Rank 1)
+        userList.sort((a, b) => {
+          if (b.studyPoints !== a.studyPoints) return b.studyPoints - a.studyPoints;
+          if (b.totalStudyMinutes !== a.totalStudyMinutes) return b.totalStudyMinutes - a.totalStudyMinutes;
+          return a.createdAt - b.createdAt;
+        });
         onData(userList);
       },
       (err) => {
         console.error('Leaderboard snapshot error:', err);
+        if (onError) onError(err);
+      }
+    );
+  },
+
+  // ==================== EVENT TRACKER ====================
+  async getEvents(uid: string): Promise<EventItem[]> {
+    if (!uid || uid === 'admin-user') {
+      try {
+        const local = localStorage.getItem('local_events');
+        return local ? JSON.parse(local) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    try {
+      const eventsCol = collection(db, 'users', uid, 'events');
+      const snap = await getDocs(eventsCol);
+      const list: EventItem[] = [];
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          name: data.name || '',
+          date: data.date || '',
+          time: data.time || undefined,
+          location: data.location || undefined,
+          notes: data.notes || undefined,
+          createdAt: typeof data.createdAt === 'number' ? data.createdAt : Date.now()
+        });
+      });
+      localStorage.setItem('local_events', JSON.stringify(list));
+      return list;
+    } catch (err) {
+      console.warn('Failed to fetch events from Firestore, using local cache:', err);
+      try {
+        const local = localStorage.getItem('local_events');
+        return local ? JSON.parse(local) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+  },
+
+  async addEvent(uid: string, eventData: Omit<EventItem, 'id' | 'createdAt'>): Promise<EventItem> {
+    const newEvent: EventItem = {
+      id: 'event_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+      name: eventData.name.trim(),
+      date: eventData.date,
+      time: eventData.time?.trim() || undefined,
+      location: eventData.location?.trim() || undefined,
+      notes: eventData.notes?.trim() || undefined,
+      createdAt: Date.now()
+    };
+
+    if (uid && uid !== 'admin-user') {
+      try {
+        const eventsCol = collection(db, 'users', uid, 'events');
+        const docRef = await addDoc(eventsCol, {
+          name: newEvent.name,
+          date: newEvent.date,
+          ...(newEvent.time ? { time: newEvent.time } : {}),
+          ...(newEvent.location ? { location: newEvent.location } : {}),
+          ...(newEvent.notes ? { notes: newEvent.notes } : {}),
+          createdAt: newEvent.createdAt
+        });
+        newEvent.id = docRef.id;
+      } catch (err) {
+        console.warn('Failed to add event to Firestore, saved locally:', err);
+      }
+    }
+
+    try {
+      const existing = localStorage.getItem('local_events');
+      const list: EventItem[] = existing ? JSON.parse(existing) : [];
+      list.push(newEvent);
+      localStorage.setItem('local_events', JSON.stringify(list));
+    } catch (e) {}
+
+    return newEvent;
+  },
+
+  async deleteEvent(uid: string, eventId: string): Promise<void> {
+    if (uid && uid !== 'admin-user') {
+      try {
+        const eventDocRef = doc(db, 'users', uid, 'events', eventId);
+        await deleteDoc(eventDocRef);
+      } catch (err) {
+        console.warn('Failed to delete event from Firestore:', err);
+      }
+    }
+
+    try {
+      const existing = localStorage.getItem('local_events');
+      if (existing) {
+        const list: EventItem[] = JSON.parse(existing);
+        const filtered = list.filter(e => e.id !== eventId);
+        localStorage.setItem('local_events', JSON.stringify(filtered));
+      }
+    } catch (e) {}
+  },
+
+  subscribeToEvents(
+    uid: string,
+    onData: (events: EventItem[]) => void,
+    onError?: (err: any) => void
+  ): () => void {
+    if (!uid || uid === 'admin-user') {
+      try {
+        const local = localStorage.getItem('local_events');
+        onData(local ? JSON.parse(local) : []);
+      } catch (e) {
+        onData([]);
+      }
+      return () => {};
+    }
+
+    const eventsCol = collection(db, 'users', uid, 'events');
+    return onSnapshot(
+      eventsCol,
+      (snap) => {
+        const list: EventItem[] = [];
+        snap.forEach((docSnap) => {
+          const data = docSnap.data();
+          list.push({
+            id: docSnap.id,
+            name: data.name || '',
+            date: data.date || '',
+            time: data.time || undefined,
+            location: data.location || undefined,
+            notes: data.notes || undefined,
+            createdAt: typeof data.createdAt === 'number' ? data.createdAt : Date.now()
+          });
+        });
+        localStorage.setItem('local_events', JSON.stringify(list));
+        onData(list);
+      },
+      (err) => {
+        console.error('Events subscription error:', err);
+        try {
+          const local = localStorage.getItem('local_events');
+          if (local) onData(JSON.parse(local));
+        } catch (e) {}
         if (onError) onError(err);
       }
     );

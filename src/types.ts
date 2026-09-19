@@ -111,3 +111,13 @@ export interface LeaderboardUserRecord {
   totalStudyMinutes?: number;
 }
 
+export interface EventItem {
+  id: string;
+  name: string;
+  date: string; // YYYY-MM-DD
+  time?: string; // HH:mm
+  location?: string;
+  notes?: string;
+  createdAt: number;
+}
+

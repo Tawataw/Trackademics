@@ -23,6 +23,8 @@ export interface DbUser {
   uid?: string;
   email?: string;
   createdAt?: number;
+  studyPoints?: number;
+  totalStudyMinutes?: number;
 }
 
 interface AuthContextType {
@@ -80,6 +82,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             createdAt: userCreatedAt
           });
 
+          const sessionMins = Array.isArray(syncedData?.studySessions)
+            ? syncedData.studySessions.reduce((acc: number, s: any) => acc + (Math.max(0, Number(s.durationMinutes)) || 0), 0)
+            : 0;
+          const userStudyMins = Math.max(Number(syncedData?.totalStudyMinutes) || 0, sessionMins);
+          const userPoints = Math.floor((userStudyMins / 60) * 20);
+
           const studentProfile: DbUser = {
             name: syncedData?.name || firebaseUser.displayName || 'Student',
             class: syncedData?.class || '',
@@ -87,7 +95,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             collegeName: syncedData?.collegeName || '',
             uid: firebaseUser.uid,
             email: firebaseUser.email || '',
-            createdAt: syncedData?.createdAt || userCreatedAt
+            createdAt: syncedData?.createdAt || userCreatedAt,
+            totalStudyMinutes: userStudyMins,
+            studyPoints: userPoints
           };
 
           const isMissingProfile = checkOnboardingNeeded(studentProfile);
@@ -216,7 +226,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ...(data.name !== undefined ? { name: data.name } : {}),
           ...(data.class !== undefined ? { class: data.class } : {}),
           ...(formattedGroup !== undefined ? { group: formattedGroup } : {}),
-          ...(data.collegeName !== undefined ? { collegeName: data.collegeName } : {})
+          ...(data.collegeName !== undefined ? { collegeName: data.collegeName } : {}),
+          ...(data.totalStudyMinutes !== undefined ? { totalStudyMinutes: data.totalStudyMinutes } : {}),
+          ...(data.studyPoints !== undefined ? { studyPoints: data.studyPoints } : {})
         });
       } catch (e) {
         console.error('Failed to update profile in Firestore:', e);
@@ -245,6 +257,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         createdAt: userCreatedAt
       });
 
+      const sessionMins = Array.isArray(synced?.studySessions)
+        ? synced.studySessions.reduce((acc: number, s: any) => acc + (Math.max(0, Number(s.durationMinutes)) || 0), 0)
+        : 0;
+      const userStudyMins = Math.max(Number(synced?.totalStudyMinutes) || 0, sessionMins);
+      const userPoints = Math.floor((userStudyMins / 60) * 20);
+
       const profile: DbUser = {
         name: synced?.name || firebaseUser.displayName || 'Student',
         class: synced?.class || '',
@@ -252,7 +270,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         collegeName: synced?.collegeName || '',
         uid: firebaseUser.uid,
         email: firebaseUser.email || '',
-        createdAt: synced?.createdAt || userCreatedAt
+        createdAt: synced?.createdAt || userCreatedAt,
+        totalStudyMinutes: userStudyMins,
+        studyPoints: userPoints
       };
 
       const isMissingProfile = checkOnboardingNeeded(profile);

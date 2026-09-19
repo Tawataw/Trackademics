@@ -18,7 +18,8 @@ import {
   Calculator,
   FlaskConical,
   CheckSquare,
-  Trophy
+  Trophy,
+  Calendar
 } from 'lucide-react';
 
 export function DashboardLayout() {
@@ -33,6 +34,7 @@ export function DashboardLayout() {
     { to: '/study-time', label: 'Study Time', icon: Clock },
     { to: '/study-lab', label: 'Study Lab', icon: FlaskConical },
     { to: '/daily-tasks', label: 'Daily Tasks', icon: CheckSquare },
+    { to: '/events', label: 'Event Tracker', icon: Calendar },
     { to: '/leaderboard', label: 'Leaderboard', icon: Trophy },
     { to: '/goals', label: 'Goals', icon: Target },
     { to: '/admission', label: 'Admission Eligibility', icon: Building },

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { dbApi } from '../lib/db';
+import { dbApi, formatStudyTime } from '../lib/db';
 import { formatClassName, formatGroupName } from '../utils/formatters';
 import { 
   Trophy, 
@@ -32,12 +32,29 @@ interface LeaderboardUser {
 }
 
 export function Leaderboard() {
-  const { user, dbUser } = useAuth();
+  const { user, dbUser, updateDbUser } = useAuth();
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'newest' | 'points'>('newest');
+  const [sortBy, setSortBy] = useState<'points' | 'newest'>('points');
   const [refreshing, setRefreshing] = useState(false);
+
+  // Retroactive Data Sync Fix: Ensure current user's study minutes and points are in sync with study logs
+  useEffect(() => {
+    const currentUid = user?.uid;
+    if (currentUid) {
+      dbApi.syncUserStudyTimeAndPoints(currentUid).then((synced) => {
+        if (synced && (dbUser?.totalStudyMinutes !== synced.totalStudyMinutes || dbUser?.studyPoints !== synced.studyPoints)) {
+          updateDbUser({
+            totalStudyMinutes: synced.totalStudyMinutes,
+            studyPoints: synced.studyPoints
+          });
+        }
+      }).catch((err) => {
+        console.warn('Leaderboard retroactive study sync notice:', err);
+      });
+    }
+  }, [user?.uid]);
 
   useEffect(() => {
     // Set up real-time listener on users collection
@@ -61,6 +78,10 @@ export function Leaderboard() {
   const handleManualRefresh = async () => {
     setRefreshing(true);
     try {
+      const currentUid = user?.uid;
+      if (currentUid) {
+        await dbApi.syncUserStudyTimeAndPoints(currentUid);
+      }
       const data = await dbApi.getLeaderboardUsers();
       setUsers(data);
     } catch (e) {
@@ -70,33 +91,55 @@ export function Leaderboard() {
     }
   };
 
-  // Ensure current user is in the list even if Firestore has local-only sync delay
+  // Ensure current user is in the list with accurate study stats even if Firestore has local-only sync delay
   const displayedUsers: LeaderboardUser[] = React.useMemo(() => {
     let list = [...users];
 
     // Check if current user is in the remote list
     const currentUid = user?.uid;
-    const exists = currentUid ? list.some(u => u.uid === currentUid) : false;
+    if (currentUid && dbUser) {
+      const idx = list.findIndex(u => u.uid === currentUid);
+      const currentStudyMins = Math.max(
+        Number(dbUser.totalStudyMinutes) || 0,
+        idx >= 0 ? list[idx].totalStudyMinutes : 0
+      );
+      const currentPts = Math.max(
+        typeof dbUser.studyPoints === 'number' ? dbUser.studyPoints : Math.floor((currentStudyMins / 60) * 20),
+        idx >= 0 ? list[idx].studyPoints : 0
+      );
 
-    if (!exists && currentUid && dbUser) {
-      list.unshift({
-        uid: currentUid,
-        name: dbUser.name || 'You',
-        collegeName: dbUser.collegeName || 'Not specified',
-        class: dbUser.class || 'Class 12',
-        group: dbUser.group || 'Science',
-        email: user?.email || '',
-        createdAt: dbUser.createdAt || Date.now(),
-        studyPoints: 120,
-        totalStudyMinutes: 0
-      });
+      if (idx >= 0) {
+        list[idx] = {
+          ...list[idx],
+          totalStudyMinutes: currentStudyMins,
+          studyPoints: currentPts,
+          collegeName: dbUser.collegeName || list[idx].collegeName,
+          class: dbUser.class || list[idx].class,
+          group: dbUser.group || list[idx].group
+        };
+      } else {
+        list.unshift({
+          uid: currentUid,
+          name: dbUser.name || 'You',
+          collegeName: dbUser.collegeName || 'Not specified',
+          class: dbUser.class || 'Class 12',
+          group: dbUser.group || 'Science',
+          email: user?.email || '',
+          createdAt: dbUser.createdAt || Date.now(),
+          studyPoints: currentPts,
+          totalStudyMinutes: currentStudyMins
+        });
+      }
     }
 
-    // Sort list
+    // Sort strictly by studyPoints descending (highest points = Rank 1) or creation date
     if (sortBy === 'points') {
-      list.sort((a, b) => b.studyPoints - a.studyPoints);
+      list.sort((a, b) => {
+        if (b.studyPoints !== a.studyPoints) return b.studyPoints - a.studyPoints;
+        if (b.totalStudyMinutes !== a.totalStudyMinutes) return b.totalStudyMinutes - a.totalStudyMinutes;
+        return a.createdAt - b.createdAt;
+      });
     } else {
-      // Temporarily sort by creation date (newest first)
       list.sort((a, b) => b.createdAt - a.createdAt);
     }
 
@@ -267,9 +310,18 @@ export function Leaderboard() {
                 <span className="truncate">{displayedUsers[1].collegeName}</span>
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <span>{formatClassName(displayedUsers[1].class)}</span>
-              <span className="font-bold text-white">{displayedUsers[1].studyPoints} pts</span>
+            <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+              <span className="text-slate-400">{formatClassName(displayedUsers[1].class)}</span>
+              <div className="text-right">
+                <div className="font-bold text-white flex items-center justify-end gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-slate-300" />
+                  <span>{displayedUsers[1].studyPoints} pts</span>
+                </div>
+                <div className="text-[11px] text-slate-400 flex items-center justify-end gap-1 mt-0.5">
+                  <Clock className="w-3 h-3 text-slate-400" />
+                  <span>{formatStudyTime(displayedUsers[1].totalStudyMinutes)}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -302,7 +354,16 @@ export function Leaderboard() {
             </div>
             <div className="mt-5 pt-3 border-t border-amber-500/20 flex items-center justify-between text-xs">
               <span className="text-amber-200/80">{formatClassName(displayedUsers[0].class)} • {formatGroupName(displayedUsers[0].group)}</span>
-              <span className="font-black text-amber-400 text-sm">{displayedUsers[0].studyPoints} pts</span>
+              <div className="text-right">
+                <div className="font-black text-amber-400 text-sm flex items-center justify-end gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{displayedUsers[0].studyPoints} pts</span>
+                </div>
+                <div className="text-xs text-amber-200/80 font-medium flex items-center justify-end gap-1 mt-0.5">
+                  <Clock className="w-3.5 h-3.5 text-amber-300" />
+                  <span>{formatStudyTime(displayedUsers[0].totalStudyMinutes)}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -333,9 +394,18 @@ export function Leaderboard() {
                 <span className="truncate">{displayedUsers[2].collegeName}</span>
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <span>{formatClassName(displayedUsers[2].class)}</span>
-              <span className="font-bold text-white">{displayedUsers[2].studyPoints} pts</span>
+            <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+              <span className="text-slate-400">{formatClassName(displayedUsers[2].class)}</span>
+              <div className="text-right">
+                <div className="font-bold text-white flex items-center justify-end gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>{displayedUsers[2].studyPoints} pts</span>
+                </div>
+                <div className="text-[11px] text-slate-400 flex items-center justify-end gap-1 mt-0.5">
+                  <Clock className="w-3 h-3 text-slate-400" />
+                  <span>{formatStudyTime(displayedUsers[2].totalStudyMinutes)}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -362,17 +432,6 @@ export function Leaderboard() {
         <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
           <span className="text-xs text-slate-400 font-medium mr-1">Sort by:</span>
           <button
-            id="leaderboard-sort-newest"
-            onClick={() => setSortBy('newest')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-              sortBy === 'newest'
-                ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
-                : 'bg-slate-800 text-slate-400 hover:text-white border border-white/10'
-            }`}
-          >
-            Newest Joined
-          </button>
-          <button
             id="leaderboard-sort-points"
             onClick={() => setSortBy('points')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
@@ -383,7 +442,26 @@ export function Leaderboard() {
           >
             Study Points
           </button>
+          <button
+            id="leaderboard-sort-newest"
+            onClick={() => setSortBy('newest')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              sortBy === 'newest'
+                ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
+                : 'bg-slate-800 text-slate-400 hover:text-white border border-white/10'
+            }`}
+          >
+            Newest Joined
+          </button>
         </div>
+      </div>
+
+      {/* Scoring Info Notice */}
+      <div 
+        id="leaderboard-scoring-info-notice"
+        className="flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-200 text-xs sm:text-sm font-medium shadow-sm backdrop-blur-sm"
+      >
+        <span>🏆 Scoring System: Earn 20 Study Points for every 60 minutes of focused study.</span>
       </div>
 
       {/* Main Leaderboard Table / Cards */}
@@ -393,7 +471,7 @@ export function Leaderboard() {
           <div className="col-span-1 text-center">Rank</div>
           <div className="col-span-6">Student & College / Institution</div>
           <div className="col-span-3">Class & Group</div>
-          <div className="col-span-2 text-right">Study Points</div>
+          <div className="col-span-2 text-right">Points & Study Time</div>
         </div>
 
         {/* Loading Skeleton */}
@@ -494,15 +572,16 @@ export function Leaderboard() {
                       </div>
                     </div>
 
-                    {/* Study Points / Metric */}
+                    {/* Study Points / Metric & Study Time */}
                     <div className="col-span-2 text-right">
                       <div className="text-sm font-bold text-amber-400 flex items-center justify-end gap-1">
                         <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                         <span>{item.studyPoints.toLocaleString()}</span>
                         <span className="text-xs text-slate-400 font-normal">pts</span>
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">
-                        {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      <div className="text-xs text-slate-300 font-medium flex items-center justify-end gap-1 mt-0.5">
+                        <Clock className="w-3 h-3 text-slate-400" />
+                        <span>{formatStudyTime(item.totalStudyMinutes)}</span>
                       </div>
                     </div>
                   </div>
@@ -543,9 +622,15 @@ export function Leaderboard() {
                             </span>
                           )}
                         </div>
-                        <div className="text-xs font-bold text-amber-400 shrink-0 flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" />
-                          <span>{item.studyPoints}</span>
+                        <div className="text-right shrink-0">
+                          <div className="text-xs font-bold text-amber-400 flex items-center justify-end gap-1">
+                            <Sparkles className="w-3 h-3" />
+                            <span>{item.studyPoints} pts</span>
+                          </div>
+                          <div className="text-[11px] text-slate-300 font-medium flex items-center justify-end gap-1 mt-0.5">
+                            <Clock className="w-2.5 h-2.5 text-slate-400" />
+                            <span>{formatStudyTime(item.totalStudyMinutes)}</span>
+                          </div>
                         </div>
                       </div>
 

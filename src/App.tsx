@@ -11,6 +11,7 @@ import { Goals } from './pages/Goals';
 import { StudyLab } from './pages/StudyLab';
 import { StudyLabTimer } from './pages/StudyLabTimer';
 import { DailyTasks } from './pages/DailyTasks';
+import { EventTracker } from './pages/EventTracker';
 import { Leaderboard } from './pages/Leaderboard';
 import { Admission } from './pages/Admission';
 import { Feedback } from './pages/Feedback';
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="study-time" element={<StudyTime />} />
             <Route path="study-lab" element={<StudyLab />} />
             <Route path="daily-tasks" element={<DailyTasks />} />
+            <Route path="events" element={<EventTracker />} />
             <Route path="leaderboard" element={<Leaderboard />} />
             <Route path="goals" element={<Goals />} />
             <Route path="admission" element={<Admission />} />

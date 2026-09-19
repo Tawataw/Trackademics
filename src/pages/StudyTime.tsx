@@ -21,7 +21,7 @@ export function StudyTime() {
   }, [user]);
 
   const handleAddSession = async () => {
-    if (!user) return;
+    if (!user || newMins <= 0) return;
     const session: StudySession = {
       id: `${user.uid}_${Date.now()}`,
       uid: user.uid,
@@ -31,6 +31,7 @@ export function StudyTime() {
     };
     
     await dbApi.saveStudySession(session);
+    await dbApi.addStudyMinutes(user.uid, newMins);
     setSessions([session, ...sessions]);
     setNewMins(0);
   };
