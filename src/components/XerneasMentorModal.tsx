@@ -163,7 +163,7 @@ export function XerneasMentorModal() {
     ]);
 
     try {
-      // Groq API (Llama 3.3 70B)
+      // Groq API (Llama 3.1 70B)
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -171,7 +171,7 @@ export function XerneasMentorModal() {
           'Authorization': 'Bearer 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'
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'llama-3.1-70b-versatile',
           messages: [
             {
               role: 'user',
@@ -208,7 +208,7 @@ export function XerneasMentorModal() {
         {
           id: 'error_' + Date.now(),
           sender: 'assistant',
-          text: 'নেটওয়ার্ক সমস্যা হচ্ছে, কনসোল চেক করো।',
+          text: 'নেটওয়ার্ক সমস্যা হচ্ছে, কনসোল চেক করো।',
           timestamp: Date.now()
         }
       ]);
@@ -250,7 +250,7 @@ export function XerneasMentorModal() {
     const prompt = `You are Xerneas AI, a strict but inspiring HSC/Admission study mentor. The student has ${studyPoints} study points and ${totalStudyMinutes} total study minutes logged. Pending tasks: ${tasksString}. Upcoming events: ${eventsString}. The student asks: "${query}". Answer in Bengali or Banglish in 2-4 concise, highly motivating, actionable sentences.`;
 
     try {
-      // Groq API (Llama 3.3 70B)
+      // Groq API (Llama 3.1 70B)
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -258,7 +258,7 @@ export function XerneasMentorModal() {
           'Authorization': 'Bearer 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'
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'llama-3.1-70b-versatile',
           messages: [
             {
               role: 'user',
@@ -294,7 +294,7 @@ export function XerneasMentorModal() {
         {
           id: 'error_' + Date.now(),
           sender: 'assistant',
-          text: 'নেটওয়ার্ক সমস্যা হচ্ছে, কনসোল চেক করো।',
+          text: 'নেটওয়ার্ক সমস্যা হচ্ছে, কনসোল চেক করো।',
           timestamp: Date.now()
         }
       ]);
@@ -505,7 +505,7 @@ export function XerneasMentorModal() {
                     Welcome to Xerneas AI Study Mentor
                   </h3>
                   <p className="text-xs text-slate-400 max-w-xs mb-5 leading-relaxed">
-                    আমি তোমার পড়াশোনার ডেটা বিশ্লেষণ করে সরাসরি পরামর্শ দিতে প্রস্তুত। উপরের 
+                    আমি তোমার পড়াশোনার ডেটা বিশ্লেষণ করে সরাসরি পরামর্শ দিতে প্রস্তুত। উপরের 
                     <strong className="text-indigo-400"> "Analyze My Progress" </strong> 
                     বাটনে ক্লিক করো অথবা সরাসরি প্রশ্ন করো।
                   </p>
@@ -516,20 +516,20 @@ export function XerneasMentorModal() {
                     </p>
                     <button
                       onClick={() => {
-                        setInputValue('আজকের বাকি পড়াগুলো শেষ করার জন্য আমাকে একটা স্ট্রিক্ট রুটিন দাও।');
+                        setInputValue('আজকের বাকি পড়াগুলো শেষ করার জন্য আমাকে একটা স্ট্রিক্ট রুটিন দাও।');
                       }}
                       className="w-full text-left p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-white/5 text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between"
                     >
-                      <span>আজকের বাকি পড়া শেষ করার স্ট্রিক্ট রুটিন দাও</span>
+                      <span>আজকের বাকি পড়া শেষ করার স্ট্রিক্ট রুটিন দাও</span>
                       <Sparkles className="w-3 h-3 text-indigo-400" />
                     </button>
                     <button
                       onClick={() => {
-                        setInputValue('ফিজিক্স এবং ম্যাথে বেশি পয়েন্ট তোলার সেরা স্ট্র্যাটেজি কী?');
+                        setInputValue('ফিজিক্স এবং ম্যাথে বেশি পয়েন্ট তোলার সেরা স্ট্র্যাটেজি কী?');
                       }}
                       className="w-full text-left p-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-white/5 text-xs text-slate-300 hover:text-white transition-colors flex items-center justify-between"
                     >
-                      <span>ফিজিক্স এবং ম্যাথে পয়েন্ট তোলার স্ট্র্যাটেজি কী?</span>
+                      <span>ফিজিক্স এবং ম্যাথে পয়েন্ট তোলার স্ট্র্যাটেজি কী?</span>
                       <Sparkles className="w-3 h-3 text-indigo-400" />
                     </button>
                   </div>
@@ -593,7 +593,7 @@ export function XerneasMentorModal() {
                 type="text"
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
-                placeholder="Ask Xerneas (e.g., পড়ার রুটিন বা পরামর্শ)..."
+                placeholder="Ask Xerneas (e.g., পড়ার রুটিন বা পরামর্শ)..."
                 disabled={analyzing}
                 className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-800/80 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all disabled:opacity-50"
               />
