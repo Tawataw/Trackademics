@@ -162,47 +162,34 @@ export function XerneasMentorModal() {
       }
     ]);
 
-    // Task 2: Safety check before calling model.generateContent()
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || !apiKey.trim()) {
-      setMessages(prev => [
-        ...prev,
-        {
-          id: 'assistant_' + Date.now(),
-          sender: 'assistant',
-          text: '⚠️ API Key Missing in Preview! Please test Xerneas AI on the live Vercel site.',
-          timestamp: Date.now(),
-          isAnalysis: true
-        }
-      ]);
-      setAnalyzing(false);
-      return;
-    }
-
     try {
-      // Task 2: Implement Native REST API Call using browser fetch
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
-      );
+      // Groq API (Llama 3.3 70B)
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer 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'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        })
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Gemini REST API Error:', response.status, response.statusText, errorData);
-        throw new Error(`REST API HTTP ${response.status}: ${JSON.stringify(errorData)}`);
+        console.error('Groq API Error:', response.status, response.statusText, errorData);
+        throw new Error(`Groq API HTTP ${response.status}: ${JSON.stringify(errorData)}`);
       }
 
-      // Task 3: Response & Error Handling
+      // Task 2: Response Extraction
       const data = await response.json();
-      const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
+      const botReply = data.choices?.[0]?.message?.content || 'No response generated.';
 
       setMessages(prev => [
         ...prev,
@@ -215,7 +202,7 @@ export function XerneasMentorModal() {
         }
       ]);
     } catch (err: any) {
-      console.error('Xerneas AI Native Fetch error:', err);
+      console.error('Xerneas AI Groq Fetch error:', err);
       setMessages(prev => [
         ...prev,
         {
@@ -249,22 +236,6 @@ export function XerneasMentorModal() {
     setInputValue('');
     setAnalyzing(true);
 
-    // Task 2: Safety check before calling API
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || !apiKey.trim()) {
-      setMessages(prev => [
-        ...prev,
-        {
-          id: 'assistant_' + Date.now(),
-          sender: 'assistant',
-          text: '⚠️ API Key Missing in Preview! Please test Xerneas AI on the live Vercel site.',
-          timestamp: Date.now()
-        }
-      ]);
-      setAnalyzing(false);
-      return;
-    }
-
     const studyPoints = contextData?.studyPoints ?? dbUser?.studyPoints ?? 0;
     const totalStudyMinutes = contextData?.totalStudyMinutes ?? dbUser?.totalStudyMinutes ?? 0;
     const pendingTasksList = contextData?.pendingTasks || [];
@@ -279,29 +250,33 @@ export function XerneasMentorModal() {
     const prompt = `You are Xerneas AI, a strict but inspiring HSC/Admission study mentor. The student has ${studyPoints} study points and ${totalStudyMinutes} total study minutes logged. Pending tasks: ${tasksString}. Upcoming events: ${eventsString}. The student asks: "${query}". Answer in Bengali or Banglish in 2-4 concise, highly motivating, actionable sentences.`;
 
     try {
-      // Task 2: Native REST API Call using browser fetch
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        }
-      );
+      // Groq API (Llama 3.3 70B)
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer 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'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        })
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Gemini REST API Error:', response.status, response.statusText, errorData);
-        throw new Error(`REST API HTTP ${response.status}: ${JSON.stringify(errorData)}`);
+        console.error('Groq API Error:', response.status, response.statusText, errorData);
+        throw new Error(`Groq API HTTP ${response.status}: ${JSON.stringify(errorData)}`);
       }
 
-      // Task 3: Response & Error Handling
+      // Task 2: Response Extraction
       const data = await response.json();
-      const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
+      const botReply = data.choices?.[0]?.message?.content || 'No response generated.';
 
       setMessages(prev => [
         ...prev,
@@ -313,7 +288,7 @@ export function XerneasMentorModal() {
         }
       ]);
     } catch (err: any) {
-      console.error('Xerneas AI Native Fetch error:', err);
+      console.error('Xerneas AI Groq Fetch error:', err);
       setMessages(prev => [
         ...prev,
         {
