@@ -1,5 +1,29 @@
 import { db, auth } from './firebase';
-import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  getDocs,
+  deleteDoc,
+  addDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  onSnapshot,
+  updateDoc
+} from 'firebase/firestore';
+
+export interface FeedbackRecord {
+  id: string;
+  userId: string;
+  userEmail: string;
+  message: string;
+  status: 'unread' | 'read';
+  createdAt: number;
+  category?: string;
+  [key: string]: any;
+}
 
 export interface SyllabusProgress {
   id: string;
@@ -557,6 +581,105 @@ export const dbApi = {
     } catch (err) {
       console.error('Failed to fetch user list from Firestore:', err);
       return [];
+    }
+  },
+
+  // Task 1: Submit feedback to Firestore 'feedbacks' collection
+  async submitFeedback(data: {
+    userId: string;
+    userEmail: string;
+    message: string;
+    category?: string;
+  }): Promise<string> {
+    try {
+      const feedbacksCol = collection(db, 'feedbacks');
+      const docRef = await addDoc(feedbacksCol, {
+        userId: data.userId,
+        userEmail: data.userEmail,
+        message: data.message.trim(),
+        status: 'unread',
+        createdAt: serverTimestamp(),
+        category: data.category || 'General'
+      });
+      return docRef.id;
+    } catch (err) {
+      console.error('Failed to write to feedbacks collection in Firestore:', err);
+      throw err;
+    }
+  },
+
+  // Task 2: Real-time listener on 'feedbacks' collection ordered by createdAt descending
+  subscribeToFeedbacks(
+    onData: (feedbacks: FeedbackRecord[]) => void,
+    onError?: (error: any) => void
+  ): () => void {
+    const feedbacksCol = collection(db, 'feedbacks');
+    const q = query(feedbacksCol, orderBy('createdAt', 'desc'));
+
+    const mapDocs = (snapshot: any): FeedbackRecord[] => {
+      const list: FeedbackRecord[] = [];
+      snapshot.forEach((docSnap: any) => {
+        const data = docSnap.data();
+        const rawCreated = data.createdAt;
+        let createdAtMs = Date.now();
+        if (rawCreated?.toMillis) {
+          createdAtMs = rawCreated.toMillis();
+        } else if (rawCreated?.seconds) {
+          createdAtMs = rawCreated.seconds * 1000;
+        } else if (typeof rawCreated === 'number') {
+          createdAtMs = rawCreated;
+        }
+
+        list.push({
+          id: docSnap.id,
+          userId: data.userId || data.uid || '',
+          userEmail: data.userEmail || data.email || 'Anonymous',
+          message: data.message || '',
+          status: data.status === 'read' ? 'read' : 'unread',
+          createdAt: createdAtMs,
+          category: data.category || 'General'
+        });
+      });
+      return list;
+    };
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const list = mapDocs(snapshot);
+        onData(list);
+      },
+      (err) => {
+        console.warn('orderBy("createdAt", "desc") query error, falling back to unordered listener:', err);
+        // Fallback: listen without orderBy in case any existing document lacks createdAt
+        const fallbackUnsub = onSnapshot(
+          feedbacksCol,
+          (snapshot) => {
+            const list = mapDocs(snapshot);
+            list.sort((a, b) => b.createdAt - a.createdAt);
+            onData(list);
+          },
+          (fallbackErr) => {
+            console.error('Failed to listen to feedbacks collection:', fallbackErr);
+            if (onError) onError(fallbackErr);
+          }
+        );
+        return fallbackUnsub;
+      }
+    );
+
+    return unsubscribe;
+  },
+
+  // Update feedback status to read
+  async markFeedbackRead(id: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'feedbacks', id);
+      await updateDoc(docRef, { status: 'read' });
+    } catch (e) {
+      console.error('Failed to update feedback status in Firestore:', e);
+      const docRef = doc(db, 'feedbacks', id);
+      await setDoc(docRef, { status: 'read' }, { merge: true });
     }
   }
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { MessageSquare, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { dbApi } from '../lib/db';
 
 export function Feedback() {
   const { user, dbUser } = useAuth();
@@ -8,34 +9,30 @@ export function Feedback() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !message.trim()) return;
+    if (!message.trim()) return;
     
     setLoading(true);
+    setErrorMessage(null);
     try {
-      const fbId = 'fb_' + Date.now();
-      const newFeedback = {
-        id: fbId,
-        uid: user.uid,
-        email: user.email || dbUser?.name || 'Unknown',
-        category,
-        message,
-        status: 'unread',
-        createdAt: Date.now()
-      };
-      
-      const existing = localStorage.getItem('hsc_feedback');
-      const feedbackList = existing ? JSON.parse(existing) : [];
-      feedbackList.push(newFeedback);
-      localStorage.setItem('hsc_feedback', JSON.stringify(feedbackList));
+      const effectiveUserId = user?.uid || 'anonymous-user';
+      const effectiveUserEmail = user?.email || dbUser?.email || (dbUser?.name ? `${dbUser.name} (no email)` : 'Anonymous');
+
+      await dbApi.submitFeedback({
+        userId: effectiveUserId,
+        userEmail: effectiveUserEmail,
+        message: message.trim(),
+        category
+      });
       
       setSuccess(true);
       setMessage('');
     } catch (err) {
-      console.error(err);
-      alert('Failed to submit feedback.');
+      console.error('Failed to submit feedback to Firestore:', err);
+      setErrorMessage('Failed to submit feedback. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -88,13 +85,30 @@ export function Feedback() {
                 placeholder="Describe your issue or suggestion here..."
               ></textarea>
             </div>
+
+            {errorMessage && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl flex items-center gap-3 text-sm">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
             <button 
               type="submit"
               disabled={loading || !message.trim()}
-              className="bg-brand-500 hover:bg-brand-600 disabled:opacity-50 transition-colors text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2"
+              className="bg-brand-500 hover:bg-brand-600 disabled:opacity-50 transition-colors text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
             >
-              <MessageSquare className="w-5 h-5" />
-              {loading ? 'Submitting...' : 'Submit Feedback'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Submitting Feedback...</span>
+                </>
+              ) : (
+                <>
+                  <MessageSquare className="w-5 h-5" />
+                  <span>Submit Feedback</span>
+                </>
+              )}
             </button>
           </form>
         </div>
