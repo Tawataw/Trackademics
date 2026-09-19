@@ -179,7 +179,7 @@ export function XerneasMentorModal() {
       ? upcomingEventsList.map(e => `• ${e.name} on ${e.date}`).join('; ')
       : 'No upcoming events/exams scheduled';
 
-    const prompt = `You are Xerneas AI, a strict and logical study mentor for an HSC/Admission student. Do not use overly formal or poetic Bengali. Use natural, conversational Banglish or simple Bengali. 
+    const prompt = `You are Xerneas AI (your name is pronounced as "জার-নী-য়াস" or ZURR-nee-us), a strict and logical study mentor for an HSC/Admission student. NEVER use religious greetings like Nomoshkar, Salam, or Adab. If you need to greet, use neutral words like 'Hello' or 'Hi'. Do not use overly formal or poetic Bengali. Use natural, conversational Banglish or simple Bengali. 
 Current Status: ${studyPoints} points (${totalStudyMinutes} mins studied). 
 Pending tasks: ${tasksString}. 
 Upcoming events: ${eventsString}. 
@@ -201,7 +201,7 @@ Provide a very brief (2-3 sentences) actionable feedback strictly based on this 
       console.error('Xerneas AI Fetch error:', err);
       setMessages(prev => [
         ...prev,
-        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek Key বসানো হয়নি' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
+        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek Key বসানো হয়নি' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
       ]);
     } finally {
       setAnalyzing(false);
@@ -232,7 +232,7 @@ Provide a very brief (2-3 sentences) actionable feedback strictly based on this 
       ? upcomingEventsList.map(e => `• ${e.name} on ${e.date}`).join('; ')
       : 'No upcoming events';
 
-    const prompt = `You are Xerneas AI, a strict HSC/Admission study mentor. Reply in natural, conversational Bengali or Banglish. No poetic words.
+    const prompt = `You are Xerneas AI (your name is pronounced as "জার-নী-য়াস" or ZURR-nee-us), a strict HSC/Admission study mentor. NEVER use religious greetings like Nomoshkar, Salam, or Adab. If you need to greet, use neutral words like 'Hello' or 'Hi'. Reply in natural, conversational Bengali or Banglish. No poetic words.
 Data: ${studyPoints} points, ${totalStudyMinutes} mins. Tasks: ${tasksString}. Events: ${eventsString}.
 User asks: "${query}". Answer practically in 2-3 sentences.`;
 
@@ -246,7 +246,7 @@ User asks: "${query}". Answer practically in 2-3 sentences.`;
       console.error('Xerneas AI Fetch error:', err);
       setMessages(prev => [
         ...prev,
-        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek Key বসানো হয়নি' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
+        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek Key বসানো হয়নি' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
       ]);
     } finally {
       setAnalyzing(false);
