@@ -25,6 +25,15 @@ export interface FeedbackRecord {
   [key: string]: any;
 }
 
+export interface StudySubject {
+  id: string;
+  uid: string;
+  name: string;
+  color: string;
+  createdAt: number;
+  [key: string]: any;
+}
+
 export interface SyllabusProgress {
   id: string;
   uid: string;
@@ -537,6 +546,16 @@ export const dbApi = {
 
     if (effectiveUid && effectiveUid !== 'admin-user' && effectiveUid !== 'student-user') {
       try {
+        // Clean up studySubjects subcollection
+        try {
+          const subjectsSnap = await getDocs(collection(db, 'users', effectiveUid, 'studySubjects'));
+          for (const sDoc of subjectsSnap.docs) {
+            await deleteDoc(sDoc.ref);
+          }
+        } catch (subErr) {
+          console.warn('Could not clean up studySubjects subcollection:', subErr);
+        }
+
         const userDocRef = doc(db, 'users', effectiveUid);
         await deleteDoc(userDocRef);
         console.log(`Successfully deleted user document from Firestore: users/${effectiveUid}`);
@@ -681,5 +700,97 @@ export const dbApi = {
       const docRef = doc(db, 'feedbacks', id);
       await setDoc(docRef, { status: 'read' }, { merge: true });
     }
+  },
+
+  // Task 5: Study Lab - studySubjects subcollection for users/{uid}/studySubjects
+  async addStudySubject(uid: string, data: { name: string; color: string }): Promise<string> {
+    try {
+      const subCol = collection(db, 'users', uid, 'studySubjects');
+      const docRef = await addDoc(subCol, {
+        uid,
+        name: data.name.trim(),
+        color: data.color,
+        createdAt: serverTimestamp()
+      });
+      return docRef.id;
+    } catch (err) {
+      console.error('Failed to add study subject in Firestore:', err);
+      throw err;
+    }
+  },
+
+  async deleteStudySubject(uid: string, subjectId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'users', uid, 'studySubjects', subjectId);
+      await deleteDoc(docRef);
+    } catch (err) {
+      console.error('Failed to delete study subject in Firestore:', err);
+      throw err;
+    }
+  },
+
+  subscribeToStudySubjects(
+    uid: string,
+    onData: (subjects: StudySubject[]) => void,
+    onError?: (error: any) => void
+  ): () => void {
+    if (!uid) {
+      onData([]);
+      return () => {};
+    }
+
+    const subCol = collection(db, 'users', uid, 'studySubjects');
+    const q = query(subCol, orderBy('createdAt', 'desc'));
+
+    const mapDocs = (snapshot: any): StudySubject[] => {
+      const list: StudySubject[] = [];
+      snapshot.forEach((docSnap: any) => {
+        const data = docSnap.data();
+        const rawCreated = data.createdAt;
+        let createdAtMs = Date.now();
+        if (rawCreated?.toMillis) {
+          createdAtMs = rawCreated.toMillis();
+        } else if (rawCreated?.seconds) {
+          createdAtMs = rawCreated.seconds * 1000;
+        } else if (typeof rawCreated === 'number') {
+          createdAtMs = rawCreated;
+        }
+
+        list.push({
+          id: docSnap.id,
+          uid: data.uid || uid,
+          name: data.name || 'Untitled Subject',
+          color: data.color || 'purple',
+          createdAt: createdAtMs
+        });
+      });
+      return list;
+    };
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const list = mapDocs(snapshot);
+        onData(list);
+      },
+      (err) => {
+        console.warn('orderBy("createdAt", "desc") on studySubjects query error, falling back to unordered listener:', err);
+        const fallbackUnsub = onSnapshot(
+          subCol,
+          (snapshot) => {
+            const list = mapDocs(snapshot);
+            list.sort((a, b) => b.createdAt - a.createdAt);
+            onData(list);
+          },
+          (fallbackErr) => {
+            console.error('Failed to listen to studySubjects collection:', fallbackErr);
+            if (onError) onError(fallbackErr);
+          }
+        );
+        return fallbackUnsub;
+      }
+    );
+
+    return unsubscribe;
   }
 };

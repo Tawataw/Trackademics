@@ -8,6 +8,8 @@ import { AcademicProgress } from './pages/AcademicProgress';
 import { SyllabusTracker } from './pages/SyllabusTracker';
 import { StudyTime } from './pages/StudyTime';
 import { Goals } from './pages/Goals';
+import { StudyLab } from './pages/StudyLab';
+import { StudyLabTimer } from './pages/StudyLabTimer';
 import { Admission } from './pages/Admission';
 import { Feedback } from './pages/Feedback';
 import { Settings } from './pages/Settings';
@@ -38,11 +40,13 @@ export default function App() {
             <Route path="legacy-calculator" element={<OldApp />} />
             <Route path="syllabus" element={<SyllabusTracker />} />
             <Route path="study-time" element={<StudyTime />} />
+            <Route path="study-lab" element={<StudyLab />} />
             <Route path="goals" element={<Goals />} />
             <Route path="admission" element={<Admission />} />
             <Route path="feedback" element={<Feedback />} />
             <Route path="settings" element={<Settings />} />
           </Route>
+          <Route path="/study-lab/timer" element={<ProtectedRoute><StudyLabTimer /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminPanel /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>

@@ -15,7 +15,8 @@ import {
   LogOut, ShieldAlert,
   Menu,
   X,
-  Calculator
+  Calculator,
+  FlaskConical
 } from 'lucide-react';
 
 export function DashboardLayout() {
@@ -28,6 +29,7 @@ export function DashboardLayout() {
     { to: '/legacy-calculator', label: 'Legacy Calculator', icon: Calculator },
     { to: '/syllabus', label: 'Syllabus Tracker', icon: BookOpen },
     { to: '/study-time', label: 'Study Time', icon: Clock },
+    { to: '/study-lab', label: 'Study Lab', icon: FlaskConical },
     { to: '/goals', label: 'Goals', icon: Target },
     { to: '/admission', label: 'Admission Eligibility', icon: Building },
     { to: '/feedback', label: 'Feedback', icon: MessageSquare },
