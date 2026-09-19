@@ -76,3 +76,38 @@ export interface EligibilityResult {
     textBn: string;
   };
 }
+
+export interface DailyTaskItem {
+  id: string;
+  text: string;
+  isCompleted: boolean;
+  createdAt: number;
+}
+
+export interface DailyTaskHistoryDay {
+  date: string; // YYYY-MM-DD
+  tasks: DailyTaskItem[];
+  completedCount: number;
+  totalCount: number;
+  archivedAt: number;
+}
+
+export interface DailyTasksDoc {
+  date: string;
+  tasks: DailyTaskItem[];
+  history: DailyTaskHistoryDay[];
+  updatedAt: number;
+}
+
+export interface LeaderboardUserRecord {
+  uid: string;
+  name: string;
+  collegeName?: string;
+  class?: string;
+  group?: string;
+  email?: string;
+  createdAt: number;
+  studyPoints: number;
+  totalStudyMinutes?: number;
+}
+

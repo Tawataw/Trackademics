@@ -19,6 +19,7 @@ export interface DbUser {
   name: string;
   class: string;
   group: string;
+  collegeName?: string;
   uid?: string;
   email?: string;
   createdAt?: number;
@@ -37,14 +38,15 @@ interface AuthContextType {
   adminLogin: (password: string) => Promise<boolean>;
   token: string | null;
   updateDbUser: (data: Partial<DbUser>) => Promise<void>;
-  completeOnboarding: (data: { name: string; class: string; group: string }) => Promise<void>;
+  completeOnboarding: (data: { name: string; class: string; group: string; collegeName: string }) => Promise<void>;
 }
 
-const checkOnboardingNeeded = (userProfile: { class?: string; group?: string } | null | undefined): boolean => {
+const checkOnboardingNeeded = (userProfile: { class?: string; group?: string; collegeName?: string } | null | undefined): boolean => {
   if (!userProfile) return true;
   const hasClass = Boolean(normalizeClass(userProfile.class));
   const hasGroup = Boolean(userProfile.group && ['SCIENCE', 'ARTS', 'COMMERCE'].includes(userProfile.group.toUpperCase()));
-  return !hasClass || !hasGroup;
+  const hasCollege = Boolean(userProfile.collegeName && userProfile.collegeName.trim().length > 0);
+  return !hasClass || !hasGroup || !hasCollege;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -82,6 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name: syncedData?.name || firebaseUser.displayName || 'Student',
             class: syncedData?.class || '',
             group: syncedData?.group ? syncedData.group.toUpperCase() : '',
+            collegeName: syncedData?.collegeName || '',
             uid: firebaseUser.uid,
             email: firebaseUser.email || '',
             createdAt: syncedData?.createdAt || userCreatedAt
@@ -155,13 +158,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const completeOnboarding = async (data: { name: string; class: string; group: string }) => {
+  const completeOnboarding = async (data: { name: string; class: string; group: string; collegeName: string }) => {
     const formattedGroup = data.group.toUpperCase();
+    const formattedCollege = data.collegeName.trim();
     const updatedProfile: DbUser = {
       ...(dbUser || { name: data.name, class: data.class, group: formattedGroup }),
       name: data.name,
       class: data.class,
       group: formattedGroup,
+      collegeName: formattedCollege,
       uid: user?.uid,
       email: user?.email || dbUser?.email || ''
     };
@@ -180,7 +185,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await dbApi.updateUserProfile(user.uid, {
           name: data.name,
           class: data.class,
-          group: formattedGroup
+          group: formattedGroup,
+          collegeName: formattedCollege
         });
       } catch (e) {
         console.error('Failed to save onboarding to Firestore:', e);
@@ -209,7 +215,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await dbApi.updateUserProfile(user.uid, {
           ...(data.name !== undefined ? { name: data.name } : {}),
           ...(data.class !== undefined ? { class: data.class } : {}),
-          ...(formattedGroup !== undefined ? { group: formattedGroup } : {})
+          ...(formattedGroup !== undefined ? { group: formattedGroup } : {}),
+          ...(data.collegeName !== undefined ? { collegeName: data.collegeName } : {})
         });
       } catch (e) {
         console.error('Failed to update profile in Firestore:', e);
@@ -242,6 +249,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: synced?.name || firebaseUser.displayName || 'Student',
         class: synced?.class || '',
         group: synced?.group ? synced.group.toUpperCase() : '',
+        collegeName: synced?.collegeName || '',
         uid: firebaseUser.uid,
         email: firebaseUser.email || '',
         createdAt: synced?.createdAt || userCreatedAt

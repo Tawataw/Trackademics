@@ -14,6 +14,28 @@ import {
   updateDoc
 } from 'firebase/firestore';
 
+export interface DailyTaskItem {
+  id: string;
+  text: string;
+  isCompleted: boolean;
+  createdAt: number;
+}
+
+export interface DailyTaskHistoryDay {
+  date: string; // YYYY-MM-DD
+  tasks: DailyTaskItem[];
+  completedCount: number;
+  totalCount: number;
+  archivedAt: number;
+}
+
+export interface DailyTasksDoc {
+  date: string;
+  tasks: DailyTaskItem[];
+  history: DailyTaskHistoryDay[];
+  updatedAt: number;
+}
+
 export interface FeedbackRecord {
   id: string;
   userId: string;
@@ -81,6 +103,7 @@ export interface UserProfileData {
   name?: string;
   class?: string;
   group?: string;
+  collegeName?: string;
   email?: string;
   uid?: string;
   createdAt?: number;
@@ -163,7 +186,7 @@ async function syncFieldToFirestore(field: string, value: any, explicitUid?: str
 
 export const dbApi = {
   // Sync all local data into Firestore when student signs in
-  async syncLocalDataToFirestore(uid: string, initialProfile?: { name?: string; email?: string; class?: string; group?: string; createdAt?: number }) {
+  async syncLocalDataToFirestore(uid: string, initialProfile?: { name?: string; email?: string; class?: string; group?: string; collegeName?: string; createdAt?: number }) {
     if (!uid || uid === 'admin-user') return;
     localStorage.setItem('current_uid', uid);
 
@@ -193,6 +216,7 @@ export const dbApi = {
         const resolvedEmail = remote.email || initialProfile?.email || localData.email || '';
         const resolvedClass = remote.class || initialProfile?.class || '';
         const resolvedGroup = remote.group || initialProfile?.group || '';
+        const resolvedCollege = remote.collegeName || initialProfile?.collegeName || localData.collegeName || '';
         const resolvedCreatedAt = remote.createdAt || initialProfile?.createdAt || remote.updatedAt || Date.now();
 
         const updatedLocal: UserProfileData = {
@@ -200,6 +224,7 @@ export const dbApi = {
           name: resolvedName,
           class: resolvedClass,
           group: resolvedGroup,
+          collegeName: resolvedCollege,
           email: resolvedEmail,
           createdAt: resolvedCreatedAt,
           uid,
@@ -220,6 +245,7 @@ export const dbApi = {
           updatedAt: Date.now(),
           ...(resolvedClass ? { class: resolvedClass } : {}),
           ...(resolvedGroup ? { group: resolvedGroup } : {}),
+          ...(resolvedCollege ? { collegeName: resolvedCollege } : {}),
           ...(mergedSyllabus.length > 0 && !remote.syllabusProgress ? { syllabusProgress: mergedSyllabus } : {}),
           ...(mergedSessions.length > 0 && !remote.studySessions ? { studySessions: mergedSessions } : {}),
           ...(mergedGoals.length > 0 && !remote.goals ? { goals: mergedGoals } : {}),
@@ -232,12 +258,14 @@ export const dbApi = {
         const initialCreatedAt = initialProfile?.createdAt || Date.now();
         const initialClass = initialProfile?.class || '';
         const initialGroup = initialProfile?.group || '';
+        const initialCollege = initialProfile?.collegeName || '';
         const initialData: UserProfileData = {
           uid,
           name: initialProfile?.name || 'Student',
           email: initialProfile?.email || '',
           class: initialClass,
           group: initialGroup,
+          collegeName: initialCollege,
           createdAt: initialCreatedAt,
           exams: [],
           syllabusProgress: [],
@@ -259,6 +287,7 @@ export const dbApi = {
         };
         if (initialClass) firestorePayload.class = initialClass;
         if (initialGroup) firestorePayload.group = initialGroup;
+        if (initialCollege) firestorePayload.collegeName = initialCollege;
 
         await setDoc(userDocRef, firestorePayload, { merge: true });
         saveProfileData(initialData);
@@ -270,12 +299,13 @@ export const dbApi = {
     }
   },
 
-  async updateUserProfile(uid: string, profile: { name?: string; class?: string; group?: string }): Promise<UserProfileData> {
+  async updateUserProfile(uid: string, profile: { name?: string; class?: string; group?: string; collegeName?: string }): Promise<UserProfileData> {
     const effectiveUid = getEffectiveUid(uid);
     const current = getProfileData();
     if (profile.name !== undefined) current.name = profile.name;
     if (profile.class !== undefined) current.class = profile.class;
     if (profile.group !== undefined) current.group = profile.group;
+    if (profile.collegeName !== undefined) current.collegeName = profile.collegeName;
     current.updatedAt = Date.now();
     saveProfileData(current);
 
@@ -288,6 +318,7 @@ export const dbApi = {
         if (profile.name !== undefined) updatePayload.name = profile.name;
         if (profile.class !== undefined) updatePayload.class = profile.class;
         if (profile.group !== undefined) updatePayload.group = profile.group;
+        if (profile.collegeName !== undefined) updatePayload.collegeName = profile.collegeName;
 
         await setDoc(userDocRef, updatePayload, { merge: true });
       } catch (err) {
@@ -792,5 +823,344 @@ export const dbApi = {
     );
 
     return unsubscribe;
+  },
+
+  // ==================== DAILY TASKS & MIDNIGHT RESET ====================
+  getTodayDateString(): string {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+
+  async getAndSyncDailyTasks(uid: string): Promise<DailyTasksDoc> {
+    if (!uid) {
+      return {
+        date: this.getTodayDateString(),
+        tasks: [],
+        history: [],
+        updatedAt: Date.now()
+      };
+    }
+
+    const today = this.getTodayDateString();
+    const taskDocRef = doc(db, 'users', uid, 'dailyTasks', 'current');
+    
+    try {
+      const snap = await getDoc(taskDocRef);
+
+      if (!snap.exists()) {
+        const initial: DailyTasksDoc = {
+          date: today,
+          tasks: [],
+          history: [],
+          updatedAt: Date.now()
+        };
+        await setDoc(taskDocRef, initial);
+        return initial;
+      }
+
+      const data = snap.data() as Partial<DailyTasksDoc>;
+      const existingDate = data.date || today;
+
+      // Midnight Reset Logic (Lazy Evaluation)
+      if (existingDate !== today) {
+        const prevTasks = data.tasks || [];
+        let newHistory = data.history || [];
+
+        // Archive existing tasks if there are any recorded tasks
+        if (prevTasks.length > 0) {
+          const completedCount = prevTasks.filter(t => t.isCompleted).length;
+          const archivedEntry: DailyTaskHistoryDay = {
+            date: existingDate,
+            tasks: prevTasks,
+            completedCount,
+            totalCount: prevTasks.length,
+            archivedAt: Date.now()
+          };
+          // Prepend and keep strictly the last 7 entries
+          newHistory = [archivedEntry, ...newHistory.filter(h => h.date !== existingDate)].slice(0, 7);
+        }
+
+        const resetDoc: DailyTasksDoc = {
+          date: today,
+          tasks: [],
+          history: newHistory,
+          updatedAt: Date.now()
+        };
+
+        await setDoc(taskDocRef, resetDoc);
+        return resetDoc;
+      }
+
+      return {
+        date: existingDate,
+        tasks: data.tasks || [],
+        history: (data.history || []).slice(0, 7),
+        updatedAt: data.updatedAt || Date.now()
+      };
+    } catch (err) {
+      console.error('Failed to sync daily tasks with Firestore:', err);
+      return {
+        date: today,
+        tasks: [],
+        history: [],
+        updatedAt: Date.now()
+      };
+    }
+  },
+
+  async addDailyTask(uid: string, text: string): Promise<DailyTaskItem> {
+    if (!uid) throw new Error('User not authenticated');
+    const current = await this.getAndSyncDailyTasks(uid);
+    const newTask: DailyTaskItem = {
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      text: text.trim(),
+      isCompleted: false,
+      createdAt: Date.now()
+    };
+
+    const updatedTasks = [...current.tasks, newTask];
+    const taskDocRef = doc(db, 'users', uid, 'dailyTasks', 'current');
+    await updateDoc(taskDocRef, {
+      tasks: updatedTasks,
+      updatedAt: Date.now()
+    });
+
+    return newTask;
+  },
+
+  async toggleDailyTask(uid: string, taskId: string): Promise<void> {
+    if (!uid) throw new Error('User not authenticated');
+    const current = await this.getAndSyncDailyTasks(uid);
+    const updatedTasks = current.tasks.map(t => 
+      t.id === taskId ? { ...t, isCompleted: !t.isCompleted } : t
+    );
+
+    const taskDocRef = doc(db, 'users', uid, 'dailyTasks', 'current');
+    await updateDoc(taskDocRef, {
+      tasks: updatedTasks,
+      updatedAt: Date.now()
+    });
+  },
+
+  async deleteDailyTask(uid: string, taskId: string): Promise<void> {
+    if (!uid) throw new Error('User not authenticated');
+    const current = await this.getAndSyncDailyTasks(uid);
+    const updatedTasks = current.tasks.filter(t => t.id !== taskId);
+
+    const taskDocRef = doc(db, 'users', uid, 'dailyTasks', 'current');
+    await updateDoc(taskDocRef, {
+      tasks: updatedTasks,
+      updatedAt: Date.now()
+    });
+  },
+
+  subscribeToDailyTasks(
+    uid: string,
+    onData: (data: DailyTasksDoc) => void,
+    onError?: (error: any) => void
+  ): () => void {
+    if (!uid) {
+      onData({
+        date: this.getTodayDateString(),
+        tasks: [],
+        history: [],
+        updatedAt: Date.now()
+      });
+      return () => {};
+    }
+
+    const taskDocRef = doc(db, 'users', uid, 'dailyTasks', 'current');
+    return onSnapshot(
+      taskDocRef,
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data() as Partial<DailyTasksDoc>;
+          onData({
+            date: data.date || this.getTodayDateString(),
+            tasks: data.tasks || [],
+            history: (data.history || []).slice(0, 7),
+            updatedAt: data.updatedAt || Date.now()
+          });
+        }
+      },
+      (err) => {
+        console.error('Failed to subscribe to dailyTasks:', err);
+        if (onError) onError(err);
+      }
+    );
+  },
+
+  // ==================== LEADERBOARD ====================
+  async getLeaderboardUsers(): Promise<Array<{
+    uid: string;
+    name: string;
+    collegeName: string;
+    class: string;
+    group: string;
+    email?: string;
+    createdAt: number;
+    studyPoints: number;
+    totalStudyMinutes: number;
+  }>> {
+    try {
+      const usersCol = collection(db, 'users');
+      const snap = await getDocs(usersCol);
+      const userList: Array<{
+        uid: string;
+        name: string;
+        collegeName: string;
+        class: string;
+        group: string;
+        email?: string;
+        createdAt: number;
+        studyPoints: number;
+        totalStudyMinutes: number;
+      }> = [];
+
+      snap.forEach((docSnap) => {
+        if (docSnap.id === 'admin-user' || docSnap.id === 'student-user') return;
+        const data = docSnap.data();
+
+        const rawCreated = data.createdAt;
+        let createdAtMs = Date.now();
+        if (rawCreated?.toMillis) {
+          createdAtMs = rawCreated.toMillis();
+        } else if (rawCreated?.seconds) {
+          createdAtMs = rawCreated.seconds * 1000;
+        } else if (typeof rawCreated === 'number') {
+          createdAtMs = rawCreated;
+        } else if (typeof data.updatedAt === 'number') {
+          createdAtMs = data.updatedAt;
+        }
+
+        // Calculate study duration if recorded
+        let totalMinutes = 0;
+        if (Array.isArray(data.studySessions)) {
+          totalMinutes = data.studySessions.reduce((acc: number, s: any) => acc + (Number(s.durationMinutes) || 0), 0);
+        }
+
+        // Dummy/actual study points
+        let points = 0;
+        if (typeof data.studyPoints === 'number' && data.studyPoints > 0) {
+          points = data.studyPoints;
+        } else if (totalMinutes > 0) {
+          points = totalMinutes * 10;
+        } else {
+          // Predictable initial study points derived from account recency
+          const daysOld = Math.max(1, Math.floor((Date.now() - createdAtMs) / (1000 * 60 * 60 * 24)));
+          points = Math.min(2500, Math.max(50, (daysOld * 45) + ((createdAtMs % 1000) / 10)));
+          points = Math.round(points);
+        }
+
+        userList.push({
+          uid: docSnap.id,
+          name: data.name || 'HSC Student',
+          collegeName: data.collegeName?.trim() || 'College / Institution Not Specified',
+          class: data.class || 'Class 12',
+          group: data.group || 'Science',
+          email: data.email || '',
+          createdAt: createdAtMs,
+          studyPoints: points,
+          totalStudyMinutes: totalMinutes
+        });
+      });
+
+      // Temporarily sort by creation date (newest first) as requested
+      return userList.sort((a, b) => b.createdAt - a.createdAt);
+    } catch (err) {
+      console.error('Failed to fetch leaderboard users:', err);
+      return [];
+    }
+  },
+
+  subscribeToLeaderboardUsers(
+    onData: (users: Array<{
+      uid: string;
+      name: string;
+      collegeName: string;
+      class: string;
+      group: string;
+      email?: string;
+      createdAt: number;
+      studyPoints: number;
+      totalStudyMinutes: number;
+    }>) => void,
+    onError?: (err: any) => void
+  ): () => void {
+    const usersCol = collection(db, 'users');
+    return onSnapshot(
+      usersCol,
+      (snap) => {
+        const userList: Array<{
+          uid: string;
+          name: string;
+          collegeName: string;
+          class: string;
+          group: string;
+          email?: string;
+          createdAt: number;
+          studyPoints: number;
+          totalStudyMinutes: number;
+        }> = [];
+
+        snap.forEach((docSnap) => {
+          if (docSnap.id === 'admin-user' || docSnap.id === 'student-user') return;
+          const data = docSnap.data();
+
+          const rawCreated = data.createdAt;
+          let createdAtMs = Date.now();
+          if (rawCreated?.toMillis) {
+            createdAtMs = rawCreated.toMillis();
+          } else if (rawCreated?.seconds) {
+            createdAtMs = rawCreated.seconds * 1000;
+          } else if (typeof rawCreated === 'number') {
+            createdAtMs = rawCreated;
+          } else if (typeof data.updatedAt === 'number') {
+            createdAtMs = data.updatedAt;
+          }
+
+          let totalMinutes = 0;
+          if (Array.isArray(data.studySessions)) {
+            totalMinutes = data.studySessions.reduce((acc: number, s: any) => acc + (Number(s.durationMinutes) || 0), 0);
+          }
+
+          let points = 0;
+          if (typeof data.studyPoints === 'number' && data.studyPoints > 0) {
+            points = data.studyPoints;
+          } else if (totalMinutes > 0) {
+            points = totalMinutes * 10;
+          } else {
+            const daysOld = Math.max(1, Math.floor((Date.now() - createdAtMs) / (1000 * 60 * 60 * 24)));
+            points = Math.min(2500, Math.max(50, (daysOld * 45) + ((createdAtMs % 1000) / 10)));
+            points = Math.round(points);
+          }
+
+          userList.push({
+            uid: docSnap.id,
+            name: data.name || 'HSC Student',
+            collegeName: data.collegeName?.trim() || 'College / Institution Not Specified',
+            class: data.class || 'Class 12',
+            group: data.group || 'Science',
+            email: data.email || '',
+            createdAt: createdAtMs,
+            studyPoints: points,
+            totalStudyMinutes: totalMinutes
+          });
+        });
+
+        userList.sort((a, b) => b.createdAt - a.createdAt);
+        onData(userList);
+      },
+      (err) => {
+        console.error('Leaderboard snapshot error:', err);
+        if (onError) onError(err);
+      }
+    );
   }
 };
+
+export const dbService = dbApi;
+

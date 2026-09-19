@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { dbApi } from '../lib/db';
 import { normalizeClass, formatClassName, formatGroupName, normalizeGroup } from '../utils/formatters';
-import { Download, Trash2, User, Moon, Sun, Monitor, Save, Edit3, CheckCircle2 } from 'lucide-react';
+import { Download, Trash2, User, Moon, Sun, Monitor, Save, Edit3, CheckCircle2, School } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function Settings() {
@@ -18,12 +18,14 @@ export function Settings() {
   // Profile edit state
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState(dbUser?.name || '');
+  const [editCollege, setEditCollege] = useState(dbUser?.collegeName || '');
   const [editClass, setEditClass] = useState(() => normalizeClass(dbUser?.class) || '12');
   const [editGroup, setEditGroup] = useState(() => normalizeGroup(dbUser?.group));
 
   useEffect(() => {
     if (dbUser) {
       setEditName(dbUser.name || '');
+      setEditCollege(dbUser.collegeName || '');
       setEditClass(normalizeClass(dbUser.class) || '12');
       setEditGroup(normalizeGroup(dbUser.group));
     }
@@ -98,11 +100,16 @@ export function Settings() {
     if (!trimmed) return;
     setLoading(true);
     try {
-      await updateDbUser({ name: trimmed, class: editClass, group: editGroup });
+      await updateDbUser({
+        name: trimmed,
+        class: editClass,
+        group: editGroup,
+        collegeName: editCollege.trim()
+      });
       setEditMode(false);
       const groupDisplayName = formatGroupName(editGroup);
       const classDisplayName = formatClassName(editClass);
-      setSuccessMessage(`Profile updated! Class set to ${classDisplayName} and Group set to ${groupDisplayName}. Syllabus, Dashboard, and Admission updated.`);
+      setSuccessMessage(`Profile updated! Class set to ${classDisplayName}, Group set to ${groupDisplayName}, and College updated. All features synchronized.`);
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err) {
       console.error(err);
@@ -126,7 +133,7 @@ export function Settings() {
         <div className="p-6 border-b border-white/10 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold flex items-center gap-2"><User className="w-5 h-5 text-blue-400" /> Account Profile</h2>
-            <p className="text-sm text-white/60 mt-1">Manage your name, academic class, and study group.</p>
+            <p className="text-sm text-white/60 mt-1">Manage your name, college/institution, academic class, and study group.</p>
           </div>
           {!editMode ? (
             <button 
@@ -141,6 +148,7 @@ export function Settings() {
               onClick={() => {
                 setEditMode(false);
                 setEditName(dbUser?.name || '');
+                setEditCollege(dbUser?.collegeName || '');
                 setEditClass(normalizeClass(dbUser?.class) || '12');
                 setEditGroup(normalizeGroup(dbUser?.group));
               }} 
@@ -163,6 +171,17 @@ export function Settings() {
                 className="w-full bg-[#1e293b] border border-white/20 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition-colors"
                 placeholder="Student Name"
                 required
+              />
+            </div>
+            <div>
+              <label className="text-sm text-white/70 block mb-2 font-medium">College / Institution Name</label>
+              <input 
+                id="settings-input-college"
+                type="text" 
+                value={editCollege}
+                onChange={e => setEditCollege(e.target.value)}
+                className="w-full bg-[#1e293b] border border-white/20 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 transition-colors"
+                placeholder="e.g. Notre Dame College, Dhaka College"
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -213,6 +232,13 @@ export function Settings() {
             <div>
               <label className="text-sm text-white/50 block mb-1">Google Email</label>
               <div className="font-medium text-white/90">{user?.email || 'N/A'}</div>
+            </div>
+            <div>
+              <label className="text-sm text-white/50 block mb-1">College / Institution</label>
+              <div className="font-medium text-white flex items-center gap-2">
+                <School className="w-4 h-4 text-brand-400 shrink-0" />
+                <span>{dbUser?.collegeName || 'Not specified'}</span>
+              </div>
             </div>
             <div>
               <label className="text-sm text-white/50 block mb-1">Class</label>

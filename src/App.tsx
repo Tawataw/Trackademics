@@ -10,6 +10,8 @@ import { StudyTime } from './pages/StudyTime';
 import { Goals } from './pages/Goals';
 import { StudyLab } from './pages/StudyLab';
 import { StudyLabTimer } from './pages/StudyLabTimer';
+import { DailyTasks } from './pages/DailyTasks';
+import { Leaderboard } from './pages/Leaderboard';
 import { Admission } from './pages/Admission';
 import { Feedback } from './pages/Feedback';
 import { Settings } from './pages/Settings';
@@ -41,6 +43,8 @@ export default function App() {
             <Route path="syllabus" element={<SyllabusTracker />} />
             <Route path="study-time" element={<StudyTime />} />
             <Route path="study-lab" element={<StudyLab />} />
+            <Route path="daily-tasks" element={<DailyTasks />} />
+            <Route path="leaderboard" element={<Leaderboard />} />
             <Route path="goals" element={<Goals />} />
             <Route path="admission" element={<Admission />} />
             <Route path="feedback" element={<Feedback />} />

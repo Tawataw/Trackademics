@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { normalizeClass } from '../utils/formatters';
-import { GraduationCap, FlaskConical, Briefcase, BookOpen, CheckCircle, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { GraduationCap, FlaskConical, Briefcase, BookOpen, CheckCircle, ArrowRight, Loader2, Sparkles, School } from 'lucide-react';
 
 export function OnboardingModal() {
   const { user, dbUser, completeOnboarding } = useAuth();
   
   const [name, setName] = useState('');
+  const [collegeName, setCollegeName] = useState('');
   const [selectedClass, setSelectedClass] = useState<'11' | '12' | 'HSC Candidate' | ''>('');
   const [selectedGroup, setSelectedGroup] = useState<'SCIENCE' | 'ARTS' | 'COMMERCE' | ''>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,6 +16,9 @@ export function OnboardingModal() {
   useEffect(() => {
     if (!name) {
       setName(user?.displayName || dbUser?.name || '');
+    }
+    if (!collegeName && dbUser?.collegeName) {
+      setCollegeName(dbUser.collegeName);
     }
     if (!selectedClass && dbUser?.class) {
       const norm = normalizeClass(dbUser.class);
@@ -30,8 +34,14 @@ export function OnboardingModal() {
     setError(null);
 
     const trimmedName = name.trim();
+    const trimmedCollege = collegeName.trim();
+
     if (!trimmedName) {
       setError('Please enter your full name.');
+      return;
+    }
+    if (!trimmedCollege) {
+      setError('Please enter your College or Institution name.');
       return;
     }
     if (!selectedClass) {
@@ -48,7 +58,8 @@ export function OnboardingModal() {
       await completeOnboarding({
         name: trimmedName,
         class: selectedClass,
-        group: selectedGroup
+        group: selectedGroup,
+        collegeName: trimmedCollege
       });
     } catch (err: any) {
       console.error('Failed to complete onboarding:', err);
@@ -146,7 +157,31 @@ export function OnboardingModal() {
             )}
           </div>
 
-          {/* Step 2: Academic Class */}
+          {/* Step 2: College / Institution Name */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-200 mb-2">
+              College / Institution Name <span className="text-brand-400">*</span>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <School className="w-5 h-5 text-brand-400" />
+              </div>
+              <input
+                id="onboarding-input-college"
+                type="text"
+                value={collegeName}
+                onChange={(e) => setCollegeName(e.target.value)}
+                placeholder="e.g. Notre Dame College, Dhaka College, Rajuk Uttara"
+                className="w-full bg-slate-900/80 border border-white/15 rounded-xl pl-11 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+            <p className="text-xs text-slate-400 mt-1.5">
+              Your college/institution will be shown next to your name on the Leaderboard.
+            </p>
+          </div>
+
+          {/* Step 3: Academic Class */}
           <div>
             <label className="block text-sm font-semibold text-slate-200 mb-2">
               Academic Class (11, 12, HSC Candidate) <span className="text-brand-400">*</span>
