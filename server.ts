@@ -22,8 +22,8 @@ app.post('/api/gemini/mentor', async (req, res) => {
 
     const { GoogleGenerativeAI } = await import('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Specify model gemini-1.5-flash-latest
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    // Specify model gemini-pro
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     const result = await model.generateContent(prompt);
     const text = result.response.text();
     return res.json({ text });

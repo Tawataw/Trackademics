@@ -182,9 +182,9 @@ export function XerneasMentorModal() {
     }
 
     try {
-      // Task 1: Model initialization with "gemini-1.5-flash-latest"
+      // Task 1: Model initialization with "gemini-pro"
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
 
@@ -205,7 +205,7 @@ export function XerneasMentorModal() {
         {
           id: 'error_' + Date.now(),
           sender: 'assistant',
-          text: `⚠️ দুঃখিত! ফিডব্যাক তৈরিতে সমস্যা হয়েছে: ${err.message || 'নেটওয়ার্ক বা এপিআই এরর'}. আবার চেষ্টা করুন।`,
+          text: 'দুঃখিত, এই মুহূর্তে সার্ভার বিজি আছে। একটু পর আবার চেষ্টা করো!',
           timestamp: Date.now()
         }
       ]);
@@ -263,9 +263,9 @@ export function XerneasMentorModal() {
     const prompt = `You are Xerneas AI, a strict but inspiring HSC/Admission study mentor. The student has ${studyPoints} study points and ${totalStudyMinutes} total study minutes logged. Pending tasks: ${tasksString}. Upcoming events: ${eventsString}. The student asks: "${query}". Answer in Bengali or Banglish in 2-4 concise, highly motivating, actionable sentences.`;
 
     try {
-      // Task 1: Model initialization with "gemini-1.5-flash-latest"
+      // Task 1: Model initialization with "gemini-pro"
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
 
@@ -285,7 +285,7 @@ export function XerneasMentorModal() {
         {
           id: 'error_' + Date.now(),
           sender: 'assistant',
-          text: `⚠️ দুঃখিত, মেসেজ প্রসেস করা সম্ভব হয়নি: ${err.message || 'কানেকশন সমস্যা'}.`,
+          text: 'দুঃখিত, এই মুহূর্তে সার্ভার বিজি আছে। একটু পর আবার চেষ্টা করো!',
           timestamp: Date.now()
         }
       ]);
