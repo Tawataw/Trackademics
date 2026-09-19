@@ -3,8 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { dbApi, EventItem, DailyTaskItem } from '../lib/db';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { generateMentorFeedback, MISSING_API_KEY_MESSAGE } from '../lib/gemini';
 import { 
   Bot, 
   Sparkles, 
@@ -182,30 +180,48 @@ export function XerneasMentorModal() {
     }
 
     try {
-      // Task 1: Model initialization with "gemini-pro"
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      // Task 2: Implement Native REST API Call using browser fetch
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Gemini REST API Error:', response.status, response.statusText, errorData);
+        throw new Error(`REST API HTTP ${response.status}: ${JSON.stringify(errorData)}`);
+      }
+
+      // Task 3: Response & Error Handling
+      const data = await response.json();
+      const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
 
       setMessages(prev => [
         ...prev,
         {
           id: 'assistant_' + Date.now(),
           sender: 'assistant',
-          text: responseText || 'No response generated.',
+          text: botReply,
           timestamp: Date.now(),
           isAnalysis: true
         }
       ]);
     } catch (err: any) {
-      console.error('Mentor analysis failed:', err);
+      console.error('Xerneas AI Native Fetch error:', err);
       setMessages(prev => [
         ...prev,
         {
           id: 'error_' + Date.now(),
           sender: 'assistant',
-          text: 'দুঃখিত, এই মুহূর্তে সার্ভার বিজি আছে। একটু পর আবার চেষ্টা করো!',
+          text: 'নেটওয়ার্ক সমস্যা হচ্ছে, কনসোল চেক করো।',
           timestamp: Date.now()
         }
       ]);
@@ -233,7 +249,7 @@ export function XerneasMentorModal() {
     setInputValue('');
     setAnalyzing(true);
 
-    // Task 2: Safety check before calling model.generateContent()
+    // Task 2: Safety check before calling API
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey || !apiKey.trim()) {
       setMessages(prev => [
@@ -263,29 +279,47 @@ export function XerneasMentorModal() {
     const prompt = `You are Xerneas AI, a strict but inspiring HSC/Admission study mentor. The student has ${studyPoints} study points and ${totalStudyMinutes} total study minutes logged. Pending tasks: ${tasksString}. Upcoming events: ${eventsString}. The student asks: "${query}". Answer in Bengali or Banglish in 2-4 concise, highly motivating, actionable sentences.`;
 
     try {
-      // Task 1: Model initialization with "gemini-pro"
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-      const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      // Task 2: Native REST API Call using browser fetch
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Gemini REST API Error:', response.status, response.statusText, errorData);
+        throw new Error(`REST API HTTP ${response.status}: ${JSON.stringify(errorData)}`);
+      }
+
+      // Task 3: Response & Error Handling
+      const data = await response.json();
+      const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.';
 
       setMessages(prev => [
         ...prev,
         {
           id: 'assistant_' + Date.now(),
           sender: 'assistant',
-          text: responseText || 'No response generated.',
+          text: botReply,
           timestamp: Date.now()
         }
       ]);
     } catch (err: any) {
-      console.error('Mentor query failed:', err);
+      console.error('Xerneas AI Native Fetch error:', err);
       setMessages(prev => [
         ...prev,
         {
           id: 'error_' + Date.now(),
           sender: 'assistant',
-          text: 'দুঃখিত, এই মুহূর্তে সার্ভার বিজি আছে। একটু পর আবার চেষ্টা করো!',
+          text: 'নেটওয়ার্ক সমস্যা হচ্ছে, কনসোল চেক করো।',
           timestamp: Date.now()
         }
       ]);
