@@ -163,7 +163,7 @@ export function XerneasMentorModal() {
     ]);
 
     try {
-      // Groq API (Llama 3.1 70B)
+      // Groq API
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -171,7 +171,7 @@ export function XerneasMentorModal() {
           'Authorization': 'Bearer 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'
         },
         body: JSON.stringify({
-          model: 'llama-3.1-70b-versatile',
+          model: 'qwen/qwen3.8-27b',
           messages: [
             {
               role: 'user',
@@ -250,7 +250,7 @@ export function XerneasMentorModal() {
     const prompt = `You are Xerneas AI, a strict but inspiring HSC/Admission study mentor. The student has ${studyPoints} study points and ${totalStudyMinutes} total study minutes logged. Pending tasks: ${tasksString}. Upcoming events: ${eventsString}. The student asks: "${query}". Answer in Bengali or Banglish in 2-4 concise, highly motivating, actionable sentences.`;
 
     try {
-      // Groq API (Llama 3.1 70B)
+      // Groq API
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -258,7 +258,7 @@ export function XerneasMentorModal() {
           'Authorization': 'Bearer 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'
         },
         body: JSON.stringify({
-          model: 'llama-3.1-70b-versatile',
+          model: 'qwen/qwen3.8-27b',
           messages: [
             {
               role: 'user',
