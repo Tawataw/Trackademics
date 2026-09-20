@@ -134,10 +134,10 @@ export function XerneasMentorModal() {
     if (selectedModel === 'groq') {
       endpoint = 'https://api.groq.com/openai/v1/chat/completions';
       apiKey = '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';
-      modelName = 'qwen/qwen3.8-27b'; // Keeping Qwen as requested
+      modelName = 'qwen/qwen3.8-27b';
     } else {
       endpoint = 'https://api.deepseek.com/chat/completions';
-      apiKey = 'YOUR_DEEPSEEK_API_KEY'; // MUST UPDATE THIS LATER
+      apiKey = 'sk-bacfb96bff6649b3b38d9c155d7bfb5b'; // DeepSeek Key added here!
       modelName = 'deepseek-chat';
     }
 
@@ -201,7 +201,7 @@ Provide a very brief (2-3 sentences) actionable feedback strictly based on this 
       console.error('Xerneas AI Fetch error:', err);
       setMessages(prev => [
         ...prev,
-        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek Key বসানো হয়নি' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
+        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek সার্ভারে এরর' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
       ]);
     } finally {
       setAnalyzing(false);
@@ -246,7 +246,7 @@ User asks: "${query}". Answer practically in 2-3 sentences.`;
       console.error('Xerneas AI Fetch error:', err);
       setMessages(prev => [
         ...prev,
-        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek Key বসানো হয়নি' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
+        { id: 'error_' + Date.now(), sender: 'assistant', text: `এপিআই সমস্যা: ${selectedModel === 'deepseek' ? 'DeepSeek সার্ভারে এরর' : 'নেটওয়ার্ক চেক করুন'}`, timestamp: Date.now() }
       ]);
     } finally {
       setAnalyzing(false);
