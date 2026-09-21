@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { dbApi, StudySession } from '../lib/db';
 import { Clock, Plus, Target } from 'lucide-react';
 import { format, subDays, startOfDay, isSameDay } from 'date-fns';
@@ -7,6 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 
 export function StudyTime() {
   const { user } = useAuth();
+  const { currentTheme } = useTheme();
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [loading, setLoading] = useState(true);
   const [newMins, setNewMins] = useState(0);
@@ -53,6 +55,8 @@ export function StudyTime() {
   const todayMins = chartData[6].minutes;
   const totalMins = sessions.reduce((acc, curr) => acc + curr.durationMinutes, 0);
 
+  const chartColor = currentTheme === 'emerald' ? '#10b981' : currentTheme === 'aurora' ? '#d946ef' : currentTheme === 'crimson' ? '#e11d48' : '#06b6d4';
+
   return (
     <div className="flex flex-col gap-8 text-white max-w-5xl mx-auto">
       <div>
@@ -62,18 +66,20 @@ export function StudyTime() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Clock className="w-5 h-5 text-brand-400" /> Log Session</h2>
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-[var(--accent-primary)]" /> Log Session
+          </h2>
           <div className="flex flex-col gap-4">
             <label className="text-sm text-white/70">Duration (Minutes)</label>
             <input 
               type="number" 
               value={newMins}
               onChange={e => setNewMins(parseInt(e.target.value) || 0)}
-              className="bg-[#1e293b] border border-white/20 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 w-full"
+              className="bg-[#1e293b] border border-white/20 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] w-full"
             />
             <button 
               onClick={handleAddSession}
-              className="bg-brand-500 hover:bg-brand-600 transition-colors text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 mt-2"
+              className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 mt-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10"
             >
               <Plus className="w-5 h-5" /> Add Study Time
             </button>
@@ -83,7 +89,7 @@ export function StudyTime() {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
             <div className="text-sm text-white/60 mb-2">Today's Study</div>
-            <div className="text-4xl font-bold text-brand-400">{Math.floor(todayMins / 60)}h {todayMins % 60}m</div>
+            <div className="text-4xl font-bold text-[var(--accent-primary)]">{Math.floor(todayMins / 60)}h {todayMins % 60}m</div>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col justify-center items-center text-center">
             <div className="text-sm text-white/60 mb-2">Total Time</div>
@@ -100,10 +106,10 @@ export function StudyTime() {
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" tick={{ fill: 'rgba(255,255,255,0.5)' }} />
               <YAxis stroke="rgba(255,255,255,0.2)" tick={{ fill: 'rgba(255,255,255,0.5)' }} />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '0.75rem' }} 
-                itemStyle={{ color: '#fff' }} 
+                contentStyle={{ backgroundColor: 'var(--card-bg-solid, #1e293b)', borderColor: 'var(--border-subtle, rgba(255,255,255,0.1))', borderRadius: '0.75rem', color: 'var(--text-main, #fff)' }} 
+                itemStyle={{ color: 'var(--text-main, #fff)' }} 
               />
-              <Bar dataKey="hours" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="hours" fill={chartColor} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

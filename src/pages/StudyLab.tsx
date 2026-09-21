@@ -227,8 +227,8 @@ export function StudyLab() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <span>Study Lab</span>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 flex items-center gap-1.5">
-              <FlaskConical className="w-3.5 h-3.5 text-brand-400" />
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 flex items-center gap-1.5">
+              <FlaskConical className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
               Focus Space
             </span>
           </h1>
@@ -239,7 +239,7 @@ export function StudyLab() {
           id="btn-add-subject"
           type="button"
           onClick={handleOpenModal}
-          className="bg-brand-500 hover:bg-brand-600 active:scale-[0.98] transition-all text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 cursor-pointer w-full sm:w-auto shrink-0"
+          className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10 cursor-pointer w-full sm:w-auto shrink-0"
         >
           <Plus className="w-5 h-5" />
           <span>+ Add Subject</span>
@@ -249,12 +249,12 @@ export function StudyLab() {
       {/* Subject Cards Grid (Unlimited subjects supported) */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-brand-400" />
+          <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-primary)]" />
           <p className="text-sm">Loading your subjects...</p>
         </div>
       ) : subjects.length === 0 ? (
         <div className="bg-slate-800/60 border border-white/10 rounded-2xl p-10 text-center flex flex-col items-center justify-center max-w-xl mx-auto my-6 shadow-xl">
-          <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400 mb-4 shadow-inner">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 flex items-center justify-center text-[var(--accent-primary)] mb-4 shadow-inner">
             <FlaskConical className="w-8 h-8" />
           </div>
           <h2 className="text-xl font-bold text-white mb-2">No Study Subjects Created</h2>
@@ -264,7 +264,7 @@ export function StudyLab() {
           <button
             type="button"
             onClick={handleOpenModal}
-            className="bg-brand-500 hover:bg-brand-600 active:scale-[0.98] transition-all text-white font-semibold py-2.5 px-5 rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-brand-500/25 cursor-pointer"
+            className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-white font-semibold py-2.5 px-5 rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-[var(--glow-primary)] border border-white/10 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Create First Subject</span>
@@ -315,10 +315,10 @@ export function StudyLab() {
                     id={`btn-play-subject-${subject.id}`}
                     type="button"
                     onClick={() => handleOpenSessionModal(subject)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-brand-500/20 hover:bg-brand-500/30 text-brand-300 hover:text-white border border-brand-500/30 transition-all font-medium text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                    className="w-full py-2.5 px-4 rounded-xl bg-[var(--accent-primary)]/20 hover:bg-[var(--accent-primary)]/30 text-white border border-[var(--accent-primary)]/40 transition-all font-medium text-sm flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] shadow-sm shadow-[var(--glow-primary)]"
                     title="Design and begin your session"
                   >
-                    <Play className="w-4 h-4 fill-current" />
+                    <Play className="w-4 h-4 fill-current text-[var(--accent-primary)]" />
                     <span>Play</span>
                   </button>
                 </div>
@@ -341,7 +341,7 @@ export function StudyLab() {
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-brand-500/20 border border-brand-500/30 flex items-center justify-center text-brand-400">
+                <div className="w-8 h-8 rounded-lg bg-[var(--accent-primary)]/20 border border-[var(--accent-primary)]/30 flex items-center justify-center text-[var(--accent-primary)]">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <h2 id="modal-add-subject-title" className="text-xl font-bold text-white">
@@ -374,7 +374,7 @@ export function StudyLab() {
                   onChange={(e) => setSubjectName(e.target.value)}
                   placeholder="e.g. Physics 1st Paper, Higher Math, Chemistry"
                   disabled={submitting}
-                  className="bg-[#0f172a] border border-white/20 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 w-full text-sm placeholder:text-white/30"
+                  className="bg-[#0f172a] border border-white/20 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] w-full text-sm placeholder:text-white/30"
                 />
               </div>
 
@@ -397,7 +397,7 @@ export function StudyLab() {
                 <button
                   type="submit"
                   disabled={submitting || !subjectName.trim()}
-                  className="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-brand-500/25 flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-[var(--glow-primary)] border border-white/10 flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <>
@@ -472,7 +472,7 @@ export function StudyLab() {
               >
                 <div className={`p-3 rounded-xl shrink-0 ${
                   selectedMode === 'marathon'
-                    ? 'bg-brand-500/20 text-brand-300 border border-brand-500/40'
+                    ? 'bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40'
                     : 'bg-white/5 text-white/60 border border-white/5'
                 }`}>
                   <Timer className="w-6 h-6" />
@@ -483,10 +483,10 @@ export function StudyLab() {
                       Marathon Session
                     </h3>
                     {selectedMode === 'marathon' && (
-                      <CheckCircle2 className="w-5 h-5 text-brand-400 shrink-0" />
+                      <CheckCircle2 className="w-5 h-5 text-[var(--accent-primary)] shrink-0" />
                     )}
                   </div>
-                  <p className="text-sm font-medium text-brand-300/90 mt-0.5">
+                  <p className="text-sm font-medium text-[var(--accent-primary)] mt-0.5">
                     Open-ended stopwatch
                   </p>
                   <p className="text-xs text-white/50 mt-1 leading-relaxed">
@@ -502,13 +502,13 @@ export function StudyLab() {
                 onClick={() => setSelectedMode('sprint')}
                 className={`w-full text-left p-4 rounded-xl border transition-all flex items-start gap-4 cursor-pointer relative ${
                   selectedMode === 'sprint'
-                    ? 'bg-brand-500/15 border-brand-500 shadow-md shadow-brand-500/10 ring-1 ring-brand-500'
+                    ? 'bg-[var(--accent-primary)]/15 border-[var(--accent-primary)] shadow-md shadow-[var(--glow-primary)] ring-1 ring-[var(--accent-primary)]'
                     : 'bg-[#0f172a]/70 hover:bg-[#0f172a] border-white/10 hover:border-white/20'
                 }`}
               >
                 <div className={`p-3 rounded-xl shrink-0 ${
                   selectedMode === 'sprint'
-                    ? 'bg-brand-500/20 text-brand-300 border border-brand-500/40'
+                    ? 'bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/40'
                     : 'bg-white/5 text-white/60 border border-white/5'
                 }`}>
                   <Zap className="w-6 h-6" />
@@ -519,10 +519,10 @@ export function StudyLab() {
                       Exam Sprint
                     </h3>
                     {selectedMode === 'sprint' && (
-                      <CheckCircle2 className="w-5 h-5 text-brand-400 shrink-0" />
+                      <CheckCircle2 className="w-5 h-5 text-[var(--accent-primary)] shrink-0" />
                     )}
                   </div>
-                  <p className="text-sm font-medium text-brand-300/90 mt-0.5">
+                  <p className="text-sm font-medium text-[var(--accent-primary)] mt-0.5">
                     Structured Intervals (e.g., 25m focus, 5m break)
                   </p>
                   <p className="text-xs text-white/50 mt-1 leading-relaxed">
@@ -556,7 +556,7 @@ export function StudyLab() {
                           setFocusTime(25);
                         }
                       }}
-                      className="w-full bg-slate-800 border border-white/10 text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                      className="w-full bg-slate-800 border border-white/10 text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors"
                       placeholder="25"
                     />
                   </div>
@@ -579,7 +579,7 @@ export function StudyLab() {
                           setBreakTime(5);
                         }
                       }}
-                      className="w-full bg-slate-800 border border-white/10 text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                      className="w-full bg-slate-800 border border-white/10 text-white rounded-xl px-3.5 py-2.5 text-sm font-medium focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors"
                       placeholder="5"
                     />
                   </div>
@@ -600,7 +600,7 @@ export function StudyLab() {
                 id="btn-begin-session"
                 type="button"
                 onClick={handleBeginSession}
-                className="flex-2 py-3 px-6 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-2 py-3 px-6 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-[var(--glow-primary)] border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" />
                 <span>Begin Session</span>

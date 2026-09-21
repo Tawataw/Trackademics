@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Login } from './pages/Login';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Dashboard } from './pages/Dashboard';
@@ -34,30 +35,32 @@ function ProtectedRoute({ children, requireAdmin = false }: { children: React.Re
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          
-          <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
-            <Route path="academic" element={<AcademicProgress />} />
-            <Route path="legacy-calculator" element={<OldApp />} />
-            <Route path="syllabus" element={<SyllabusTracker />} />
-            <Route path="study-time" element={<StudyTime />} />
-            <Route path="study-lab" element={<StudyLab />} />
-            <Route path="study-hub" element={<StudyHub />} />
-            <Route path="daily-tasks" element={<DailyTasks />} />
-            <Route path="events" element={<EventTracker />} />
-            <Route path="leaderboard" element={<Leaderboard />} />
-            <Route path="goals" element={<Goals />} />
-            <Route path="admission" element={<Admission />} />
-            <Route path="feedback" element={<Feedback />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="/study-lab/timer" element={<ProtectedRoute><StudyLabTimer /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminPanel /></ProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            
+            <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+              <Route index element={<Dashboard />} />
+              <Route path="academic" element={<AcademicProgress />} />
+              <Route path="legacy-calculator" element={<OldApp />} />
+              <Route path="syllabus" element={<SyllabusTracker />} />
+              <Route path="study-time" element={<StudyTime />} />
+              <Route path="study-lab" element={<StudyLab />} />
+              <Route path="study-hub" element={<StudyHub />} />
+              <Route path="daily-tasks" element={<DailyTasks />} />
+              <Route path="events" element={<EventTracker />} />
+              <Route path="leaderboard" element={<Leaderboard />} />
+              <Route path="goals" element={<Goals />} />
+              <Route path="admission" element={<Admission />} />
+              <Route path="feedback" element={<Feedback />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+            <Route path="/study-lab/timer" element={<ProtectedRoute><StudyLabTimer /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminPanel /></ProtectedRoute>} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

@@ -194,7 +194,7 @@ export function SyllabusTracker() {
                     key={chap.id}
                     className={`p-4 rounded-xl border flex flex-col justify-between gap-3 transition-all ${
                       info.count === chap.maxCount
-                        ? 'bg-brand-500/10 border-brand-500/30'
+                        ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/30'
                         : info.count > 0
                         ? 'bg-white/[0.07] border-white/20'
                         : 'bg-white/5 border-white/10'
@@ -205,8 +205,8 @@ export function SyllabusTracker() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-semibold text-white">{chap.name}</span>
                           {info.count === chap.maxCount && (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30 px-2 py-0.5 rounded-full">
-                              <CheckCircle2 className="w-3 h-3 text-brand-400" /> Completed
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 px-2 py-0.5 rounded-full">
+                              <CheckCircle2 className="w-3 h-3 text-[var(--accent-primary)]" /> Completed
                             </span>
                           )}
                         </div>
@@ -219,7 +219,7 @@ export function SyllabusTracker() {
                     {/* Progress track */}
                     <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-brand-500 rounded-full transition-all duration-300"
+                        className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full transition-all duration-300"
                         style={{ width: `${Math.round(info.ratio * 100)}%` }}
                       />
                     </div>
@@ -248,7 +248,7 @@ export function SyllabusTracker() {
                               const val = parseInt(e.target.value);
                               setNumericChapterCount(subjectId, paperName, chap.id, isNaN(val) ? 0 : val, chap.maxCount!, paperConfig);
                             }}
-                            className="w-14 text-center bg-black/40 border border-white/15 focus:border-brand-400 rounded-lg py-1 text-sm font-bold text-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-14 text-center bg-black/40 border border-white/15 focus:border-[var(--accent-primary)] rounded-lg py-1 text-sm font-bold text-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                           <span className="text-xs text-white/40 font-medium">/ {chap.maxCount}</span>
                         </div>
@@ -274,11 +274,11 @@ export function SyllabusTracker() {
                   type="button"
                   onClick={() => toggleChapter(subjectId, paperName, chap.id, paperConfig)}
                   className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-colors ${
-                    info.isChecked ? 'bg-brand-500/10 border-brand-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    info.isChecked ? 'bg-[var(--accent-primary)]/10 border-[var(--accent-primary)]/30' : 'bg-white/5 border-white/10 hover:bg-white/10'
                   }`}
                 >
                   {info.isChecked ? (
-                    <CheckCircle2 className="w-5 h-5 text-brand-400 flex-shrink-0" />
+                    <CheckCircle2 className="w-5 h-5 text-[var(--accent-primary)] flex-shrink-0" />
                   ) : (
                     <Circle className="w-5 h-5 text-white/30 flex-shrink-0" />
                   )}
@@ -298,7 +298,7 @@ export function SyllabusTracker() {
         <div className="mb-6 last:mb-0">
           <div className="flex justify-between items-center mb-3">
             <h4 className="font-bold text-white/80">{paperName === 'paper1' ? '1st Paper' : '2nd Paper'}</h4>
-            <span className="text-sm font-medium text-brand-400">{completed} / {total}</span>
+            <span className="text-sm font-medium text-[var(--accent-primary)]">{completed} / {total}</span>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
             <label className="text-sm text-white/70">{paperConfig.itemName} completed:</label>
@@ -308,7 +308,7 @@ export function SyllabusTracker() {
               max={total} 
               value={completed} 
               onChange={e => setNumericCount(subjectId, paperName, parseInt(e.target.value), total)}
-              className="w-full accent-brand-500"
+              className="w-full accent-[var(--accent-primary)]"
             />
           </div>
         </div>
@@ -337,7 +337,7 @@ export function SyllabusTracker() {
           <h2 className="text-xl font-bold">Overall Progress</h2>
           <p className="text-sm text-white/60">{displayOverallCompleted} out of {overallTotal} topics completed</p>
         </div>
-        <div className="text-3xl font-bold text-brand-400">{overallPercent}%</div>
+        <div className="text-3xl font-bold text-[var(--accent-primary)]">{overallPercent}%</div>
       </div>
 
       <div className="flex flex-col gap-6">
@@ -364,7 +364,7 @@ export function SyllabusTracker() {
                 <h3 className="text-xl font-bold">{subject.name}</h3>
                 <div className="flex items-center gap-3">
                   <div className="w-32 h-2 bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-500 rounded-full transition-all duration-300" style={{ width: `${sPct}%` }}></div>
+                    <div className="h-full bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full transition-all duration-300" style={{ width: `${sPct}%` }}></div>
                   </div>
                   <span className="text-sm font-bold w-10 text-right">{sPct}%</span>
                 </div>

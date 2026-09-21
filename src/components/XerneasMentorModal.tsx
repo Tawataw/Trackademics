@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { dbApi, EventItem, DailyTaskItem } from '../lib/db';
+import { XerneasFAB } from './ui/XerneasFAB';
 import { 
   Bot, 
   Sparkles, 
@@ -279,121 +280,105 @@ Instruction: Use this context naturally if the user asks about themselves, their
 
   return (
     <>
-      <button
-        id="xerneas-fab-btn"
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white shadow-lg shadow-indigo-600/40 hover:shadow-indigo-500/60 border border-indigo-400/30 transition-all duration-300 transform hover:scale-105 active:scale-95 focus:outline-none"
-      >
-        <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-60 blur group-hover:opacity-100 animate-pulse transition duration-700 pointer-events-none" />
-        <span className="relative flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white shadow-inner">
-          <Sparkles className="w-4 h-4 animate-spin-slow" />
-        </span>
-        <span className="relative font-semibold text-sm tracking-wide hidden xs:inline-block sm:inline-block">
-          Xerneas AI
-        </span>
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-        </span>
-      </button>
+      <XerneasFAB onClick={() => setIsOpen(true)} isOpen={isOpen} />
 
       {isOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onClick={() => setIsOpen(false)} />
 
-          <div className="fixed inset-y-0 right-0 w-full sm:w-[480px] md:w-[520px] bg-slate-900 border-l border-white/10 shadow-2xl flex flex-col z-50 text-white animate-in slide-in-from-right duration-300">
+          <div className="fixed inset-y-0 right-0 w-full sm:w-[480px] md:w-[520px] bg-[var(--card-bg-solid)] border-l border-[var(--border-subtle)] shadow-2xl flex flex-col z-50 text-[var(--text-main)] animate-in slide-in-from-right duration-300">
             {/* Header */}
-            <div className="p-4 sm:p-5 border-b border-white/10 bg-slate-900/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-10">
+            <div className="p-4 sm:p-5 border-b border-[var(--border-subtle)] bg-[var(--card-bg-solid)]/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 ring-2 ring-indigo-400/30">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white shadow-md shadow-[var(--glow-primary)] ring-2 ring-white/10">
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
+                    <h2 className="text-base sm:text-lg font-bold text-[var(--text-main)] tracking-tight flex items-center gap-1.5">
                       Xerneas AI
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Mentor</span>
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30">Mentor</span>
                     </h2>
                   </div>
-                  <p className="text-xs text-slate-400">Context-Aware HSC & Admission Coach</p>
+                  <p className="text-xs text-[var(--text-muted)]">Context-Aware HSC & Admission Coach</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-1.5">
-                <button onClick={fetchUserContext} disabled={loadingContext} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50">
-                  <RefreshCw className={`w-4 h-4 ${loadingContext ? 'animate-spin text-indigo-400' : ''}`} />
+                <button onClick={fetchUserContext} disabled={loadingContext} className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-white/10 transition-colors disabled:opacity-50 cursor-pointer">
+                  <RefreshCw className={`w-4 h-4 ${loadingContext ? 'animate-spin text-[var(--accent-primary)]' : ''}`} />
                 </button>
-                <button onClick={() => setIsOpen(false)} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
+                <button onClick={() => setIsOpen(false)} className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-white/10 transition-colors cursor-pointer">
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
             {/* Context Indicator */}
-            <div className="px-4 py-2.5 bg-slate-950/60 border-b border-white/5 flex flex-col gap-2">
+            <div className="px-4 py-2.5 bg-[var(--bg-main)]/80 border-b border-[var(--border-subtle)] flex flex-col gap-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Live Sync Context:
+                <span className="text-[var(--text-muted)] flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[var(--accent-primary)]" /> Live Sync Context:
                 </span>
-                <button onClick={() => setShowContextDetails(!showContextDetails)} className="text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 text-[11px]">
+                <button onClick={() => setShowContextDetails(!showContextDetails)} className="text-[var(--accent-primary)] hover:opacity-80 font-medium flex items-center gap-1 text-[11px] cursor-pointer">
                   {showContextDetails ? 'Hide details' : 'View details'}
                   {showContextDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                 </button>
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="p-2 rounded-lg bg-slate-800/80 border border-white/5 flex flex-col items-center">
+                <div className="p-2 rounded-lg bg-[var(--card-bg)] border border-[var(--border-subtle)] flex flex-col items-center">
                   <div className="flex items-center gap-1 text-amber-400 font-semibold"><Trophy className="w-3 h-3" /><span>{contextData?.studyPoints ?? 0} pts</span></div>
-                  <span className="text-[10px] text-slate-400">{contextData?.totalStudyMinutes ?? 0}m studied</span>
+                  <span className="text-[10px] text-[var(--text-muted)]">{contextData?.totalStudyMinutes ?? 0}m studied</span>
                 </div>
-                <div className="p-2 rounded-lg bg-slate-800/80 border border-white/5 flex flex-col items-center">
+                <div className="p-2 rounded-lg bg-[var(--card-bg)] border border-[var(--border-subtle)] flex flex-col items-center">
                   <div className="flex items-center gap-1 text-emerald-400 font-semibold"><CheckCircle2 className="w-3 h-3" /><span>{contextData?.pendingTasks.length ?? 0} Pending</span></div>
-                  <span className="text-[10px] text-slate-400">Daily Tasks</span>
+                  <span className="text-[10px] text-[var(--text-muted)]">Daily Tasks</span>
                 </div>
-                <div className="p-2 rounded-lg bg-slate-800/80 border border-white/5 flex flex-col items-center">
-                  <div className="flex items-center gap-1 text-indigo-400 font-semibold"><Calendar className="w-3 h-3" /><span>{contextData?.upcomingEvents.length ?? 0} Events</span></div>
-                  <span className="text-[10px] text-slate-400">Upcoming</span>
+                <div className="p-2 rounded-lg bg-[var(--card-bg)] border border-[var(--border-subtle)] flex flex-col items-center">
+                  <div className="flex items-center gap-1 text-[var(--accent-primary)] font-semibold"><Calendar className="w-3 h-3" /><span>{contextData?.upcomingEvents.length ?? 0} Events</span></div>
+                  <span className="text-[10px] text-[var(--text-muted)]">Upcoming</span>
                 </div>
               </div>
 
               {showContextDetails && (
-                <div className="mt-1 p-2.5 rounded-lg bg-slate-900 border border-white/10 text-xs space-y-2 max-h-36 overflow-y-auto">
+                <div className="mt-1 p-2.5 rounded-lg bg-[var(--card-bg-solid)] border border-[var(--border-subtle)] text-xs space-y-2 max-h-36 overflow-y-auto">
                   <div>
-                    <span className="font-semibold text-slate-300">Pending Tasks:</span>
+                    <span className="font-semibold text-[var(--text-main)]">Pending Tasks:</span>
                     {contextData?.pendingTasks && contextData.pendingTasks.length > 0 ? (
-                      <ul className="list-disc list-inside text-slate-400 mt-1 space-y-0.5">
+                      <ul className="list-disc list-inside text-[var(--text-muted)] mt-1 space-y-0.5">
                         {contextData.pendingTasks.map(t => <li key={t.id} className="truncate">{t.text}</li>)}
                       </ul>
-                    ) : <p className="text-slate-500 italic mt-0.5">None pending today</p>}
+                    ) : <p className="text-[var(--text-muted)] italic mt-0.5">None pending today</p>}
                   </div>
                   <div>
-                    <span className="font-semibold text-slate-300">Upcoming Events:</span>
+                    <span className="font-semibold text-[var(--text-main)]">Upcoming Events:</span>
                     {contextData?.upcomingEvents && contextData.upcomingEvents.length > 0 ? (
-                      <ul className="list-disc list-inside text-slate-400 mt-1 space-y-0.5">
+                      <ul className="list-disc list-inside text-[var(--text-muted)] mt-1 space-y-0.5">
                         {contextData.upcomingEvents.map(e => <li key={e.id} className="truncate">{e.name} ({e.date})</li>)}
                       </ul>
-                    ) : <p className="text-slate-500 italic mt-0.5">No upcoming events logged</p>}
+                    ) : <p className="text-[var(--text-muted)] italic mt-0.5">No upcoming events logged</p>}
                   </div>
                 </div>
               )}
             </div>
 
             {/* Chat History */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[var(--bg-main)]/60">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-                  <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4 shadow-inner">
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[var(--text-muted)]">
+                  <div className="w-16 h-16 rounded-2xl bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 flex items-center justify-center text-[var(--accent-primary)] mb-4 shadow-inner">
                     <Bot className="w-8 h-8" />
                   </div>
-                  <h3 className="text-base font-semibold text-white mb-1">Welcome to Xerneas AI Study Mentor</h3>
-                  <p className="text-xs text-slate-400 max-w-xs mb-5 leading-relaxed">আমি তোমার প্রোফাইল এবং পড়াশোনার ডেটা বিশ্লেষণ করে সরাসরি পরামর্শ দিতে প্রস্তুত।</p>
+                  <h3 className="text-base font-semibold text-[var(--text-main)] mb-1">Welcome to Xerneas AI Study Mentor</h3>
+                  <p className="text-xs text-[var(--text-muted)] max-w-xs mb-5 leading-relaxed">আমি তোমার প্রোফাইল এবং পড়াশোনার ডেটা বিশ্লেষণ করে সরাসরি পরামর্শ দিতে প্রস্তুত।</p>
                 </div>
               ) : (
                 messages.map(msg => (
                   <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                     <div className="flex items-start gap-2.5 max-w-[88%]">
-                      {msg.sender === 'assistant' && <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm"><Bot className="w-3.5 h-3.5" /></div>}
-                      <div className={`p-3.5 rounded-2xl text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' : 'bg-slate-800/90 border border-indigo-500/20 text-slate-100 shadow-sm'}`}>
+                      {msg.sender === 'assistant' && <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm"><Bot className="w-3.5 h-3.5" /></div>}
+                      <div className={`p-3.5 rounded-2xl text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white shadow-md' : 'bg-[var(--card-bg)] border border-[var(--border-subtle)] text-[var(--text-main)] shadow-sm'}`}>
                         {msg.isAnalysis && msg.sender === 'assistant' && <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 mb-1.5 pb-1 border-b border-white/10"><Sparkles className="w-3.5 h-3.5" /> Xerneas Progress Assessment</div>}
                         <p className="whitespace-pre-wrap font-sans">{msg.text}</p>
                       </div>
@@ -403,27 +388,27 @@ Instruction: Use this context naturally if the user asks about themselves, their
               )}
               {analyzing && (
                 <div className="flex items-start gap-2.5 max-w-[85%]">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white flex-shrink-0 mt-0.5 animate-pulse"><Bot className="w-3.5 h-3.5" /></div>
-                  <div className="p-3.5 rounded-2xl bg-slate-800 border border-indigo-500/20 text-slate-300 text-sm flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin text-indigo-400" /><span>Xerneas is analyzing data...</span></div>
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white flex-shrink-0 mt-0.5 animate-pulse"><Bot className="w-3.5 h-3.5" /></div>
+                  <div className="p-3.5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-subtle)] text-[var(--text-muted)] text-sm flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin text-[var(--accent-primary)]" /><span>Xerneas is analyzing data...</span></div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Form - Cleaned up without dropdown */}
-            <form onSubmit={handleSendMessage} className="p-3 bg-slate-900 border-t border-white/10 flex items-center gap-2">
+            {/* Input Form */}
+            <form onSubmit={handleSendMessage} className="p-3 bg-[var(--card-bg-solid)] border-t border-[var(--border-subtle)] flex items-center gap-2">
               <input
                 type="text"
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 placeholder="Ask Xerneas (e.g., আমার জিপিএ কত? বা আমার নাম কী?)..."
                 disabled={analyzing}
-                className="flex-1 px-4 py-3 rounded-xl bg-slate-800/80 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all disabled:opacity-50 min-w-0"
+                className="flex-1 px-4 py-3 rounded-xl bg-[var(--card-bg)] border border-[var(--border-subtle)] text-[var(--text-main)] placeholder-[var(--text-muted)]/60 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/50 focus:border-[var(--accent-primary)] transition-all disabled:opacity-50 min-w-0"
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim() || analyzing}
-                className="p-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center flex-shrink-0"
+                className="p-3 rounded-xl bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white shadow-md shadow-[var(--glow-primary)] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center flex-shrink-0 cursor-pointer"
               >
                 <Send className="w-5 h-5" />
               </button>

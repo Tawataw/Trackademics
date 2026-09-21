@@ -215,7 +215,7 @@ export function DailyTasks() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center shadow-lg shadow-[var(--glow-primary)]">
               <CheckSquare className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Daily Tasks</h1>
@@ -227,7 +227,7 @@ export function DailyTasks() {
 
         {/* Date & Quick Reset Status */}
         <div className="flex items-center gap-3 bg-slate-800/80 border border-white/10 px-4 py-2.5 rounded-xl self-start md:self-auto">
-          <Calendar className="w-4 h-4 text-brand-400 shrink-0" />
+          <Calendar className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
           <div className="text-xs">
             <div className="font-semibold text-white">{todayPretty}</div>
             <div className="text-white/50 flex items-center gap-1.5 mt-0.5">
@@ -254,7 +254,7 @@ export function DailyTasks() {
           <div className="bg-slate-800 border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl shadow-black/20">
             <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
               <div className="flex items-center gap-2.5">
-                <ListTodo className="w-5 h-5 text-brand-400" />
+                <ListTodo className="w-5 h-5 text-[var(--accent-primary)]" />
                 <h2 className="text-lg font-bold text-white">Today's Tasks</h2>
               </div>
               <div className="flex items-center gap-2">
@@ -265,7 +265,7 @@ export function DailyTasks() {
                   <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                     completionPercentage === 100 
                       ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                      : 'bg-brand-500/20 text-brand-300 border border-brand-500/30'
+                      : 'bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
                   }`}>
                     {completionPercentage}%
                   </span>
@@ -280,7 +280,7 @@ export function DailyTasks() {
                   className={`h-full transition-all duration-300 rounded-full ${
                     completionPercentage === 100 
                       ? 'bg-gradient-to-r from-emerald-500 to-teal-400' 
-                      : 'bg-gradient-to-r from-brand-500 to-indigo-400'
+                      : 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]'
                   }`}
                   style={{ width: `${completionPercentage}%` }}
                 />
@@ -296,7 +296,7 @@ export function DailyTasks() {
                   value={newTaskText}
                   onChange={(e) => setNewTaskText(e.target.value)}
                   placeholder="Add a new task (e.g., Study 2h, Namaz, Revise Bio)..."
-                  className="w-full bg-slate-900 border border-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+                  className="w-full bg-slate-900 border border-white/10 text-white placeholder-white/40 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-colors"
                   disabled={loading || addingTask}
                 />
               </div>
@@ -304,7 +304,7 @@ export function DailyTasks() {
                 id="add-daily-task-button"
                 type="submit"
                 disabled={!newTaskText.trim() || loading || addingTask}
-                className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-brand-500/20 shrink-0"
+                className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-[var(--glow-primary)] border border-white/10 shrink-0"
               >
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline text-sm font-semibold">Add</span>
@@ -314,7 +314,7 @@ export function DailyTasks() {
             {/* Quick Suggestion Chips */}
             <div className="mb-6">
               <div className="flex items-center gap-1.5 text-xs text-white/50 mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+                <Sparkles className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
                 <span>Quick suggestions:</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -327,7 +327,7 @@ export function DailyTasks() {
                       const input = document.getElementById('daily-task-input');
                       if (input) input.focus();
                     }}
-                    className="text-xs bg-white/5 hover:bg-brand-500/20 hover:text-brand-300 border border-white/10 px-2.5 py-1 rounded-lg text-white/70 transition-colors"
+                    className="text-xs bg-white/5 hover:bg-[var(--accent-primary)]/20 hover:text-white hover:border-[var(--accent-primary)]/40 border border-white/10 px-2.5 py-1 rounded-lg text-white/70 transition-colors"
                   >
                     + {sug}
                   </button>
@@ -338,7 +338,7 @@ export function DailyTasks() {
             {/* Task List */}
             {loading ? (
               <div className="py-12 text-center text-white/50 text-sm animate-pulse flex flex-col items-center gap-2">
-                <Clock className="w-6 h-6 text-brand-400 animate-spin" />
+                <Clock className="w-6 h-6 text-[var(--accent-primary)] animate-spin" />
                 <span>Synchronizing tasks with Firestore...</span>
               </div>
             ) : tasks.length === 0 ? (
@@ -361,7 +361,7 @@ export function DailyTasks() {
                       className={`group flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer ${
                         isDone
                           ? 'bg-slate-900/50 border-white/5 text-white/50'
-                          : 'bg-slate-900 border-white/10 text-white hover:border-brand-500/40 hover:bg-slate-900/90'
+                          : 'bg-slate-900 border-white/10 text-white hover:border-[var(--accent-primary)]/40 hover:bg-slate-900/90'
                       }`}
                     >
                       <div className="flex items-center gap-3.5 min-w-0 pr-3">
@@ -376,7 +376,7 @@ export function DailyTasks() {
                           className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 transition-colors ${
                             isDone 
                               ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20' 
-                              : 'border-2 border-white/30 hover:border-brand-400 bg-white/5'
+                              : 'border-2 border-white/30 hover:border-[var(--accent-primary)] bg-white/5'
                           }`}
                         >
                           {isDone && <CheckCircle2 className="w-4 h-4 text-white" />}
@@ -415,7 +415,7 @@ export function DailyTasks() {
           <div className="bg-slate-800 border border-white/10 rounded-2xl p-5 sm:p-6 shadow-xl shadow-black/20">
             <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
               <div className="flex items-center gap-2.5">
-                <RotateCcw className="w-5 h-5 text-indigo-400" />
+                <RotateCcw className="w-5 h-5 text-[var(--accent-primary)]" />
                 <h2 className="text-lg font-bold text-white">7-Day History</h2>
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70">
@@ -465,7 +465,7 @@ export function DailyTasks() {
                         className="w-full flex items-center justify-between p-3.5 text-left hover:bg-white/5 transition-colors focus:outline-none"
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <Calendar className="w-4 h-4 text-brand-400 shrink-0" />
+                          <Calendar className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
                           <div>
                             <div className="text-sm font-semibold text-white">
                               {formatHeaderDate(dateKey)}
@@ -482,7 +482,7 @@ export function DailyTasks() {
                               dayRate === 100
                                 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                                 : dayRate >= 50
-                                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                                ? 'bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
                                 : 'bg-white/5 text-white/60 border border-white/10'
                             }`}
                           >

@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { dbApi } from '../lib/db';
 import { normalizeClass, formatClassName, formatGroupName, normalizeGroup } from '../utils/formatters';
-import { Download, Trash2, User, Moon, Sun, Monitor, Save, Edit3, CheckCircle2, School } from 'lucide-react';
+import { Download, Trash2, User, Palette, Sparkles, Check, Save, Edit3, CheckCircle2, School } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function Settings() {
   const { user, dbUser, updateDbUser, logOut, deleteAccountAndData } = useAuth();
+  const { currentTheme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  
-  // Theme state
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   
   // Profile edit state
   const [editMode, setEditMode] = useState(false);
@@ -78,22 +77,6 @@ export function Settings() {
       setLoading(false);
     }
   };
-
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    if (newTheme === 'light') {
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.remove('light');
-    }
-  };
-  
-  // Initialize theme on load
-  useEffect(() => {
-    if (theme === 'light') document.documentElement.classList.add('light');
-    else document.documentElement.classList.remove('light');
-  }, []);
 
   const handleSaveProfile = async () => {
     const trimmed = editName.trim();
@@ -254,28 +237,300 @@ export function Settings() {
         )}
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/10">
-          <h2 className="text-xl font-bold flex items-center gap-2"><Monitor className="w-5 h-5 text-purple-400" /> Appearance</h2>
+      {/* Theme Selection */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl shadow-xl">
+        <div className="p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Palette className="w-5 h-5 text-indigo-400" /> Theme Selection
+            </h2>
+            <p className="text-sm text-white/60 mt-1">
+              Personalize Trackademics with high-contrast, distraction-free aesthetic themes.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/80 border border-white/10 w-fit">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            Active: <span className="text-white capitalize">{currentTheme === 'aurora' ? 'Aurora' : currentTheme === 'emerald' ? 'Emerald Matrix' : currentTheme === 'crimson' ? 'Crimson' : 'Deep Space'}</span>
+          </span>
         </div>
+        
         <div className="p-6">
-          <div className="flex gap-4">
-            <button 
-              onClick={() => handleThemeChange('dark')}
-              className={`flex-1 py-4 border rounded-xl flex items-center justify-center gap-2 font-medium transition-colors ${
-                theme === 'dark' ? 'bg-brand-500/20 border-brand-500 text-brand-400' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white'
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            {/* Theme Card 1: Deep Space */}
+            <div
+              id="theme-card-deep-space"
+              onClick={() => setTheme('deep-space')}
+              className={`group relative rounded-2xl p-5 border transition-all duration-300 cursor-pointer text-left flex flex-col justify-between ${
+                currentTheme === 'deep-space'
+                  ? 'bg-slate-950/90 border-cyan-500/60 shadow-lg shadow-cyan-500/15 ring-2 ring-cyan-500/40'
+                  : 'bg-slate-950/40 border-white/10 hover:border-cyan-500/30 hover:bg-slate-950/60'
               }`}
             >
-              <Moon className="w-5 h-5" /> Dark Mode
-            </button>
-            <button 
-              onClick={() => handleThemeChange('light')}
-              className={`flex-1 py-4 border rounded-xl flex items-center justify-center gap-2 font-medium transition-colors ${
-                theme === 'light' ? 'bg-brand-500/20 border-brand-500 text-brand-400' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white'
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 shadow-sm shadow-cyan-400/50" />
+                    <h3 className="font-bold text-lg text-white group-hover:text-cyan-300 transition-colors">
+                      Deep Space
+                    </h3>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                      Default
+                    </span>
+                  </div>
+                  {currentTheme === 'deep-space' && (
+                    <div className="w-6 h-6 rounded-full bg-cyan-500 text-slate-950 flex items-center justify-center font-bold">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+                  Slate-950 foundation with glowing cyan and electric blue accents. Engineered for deep focus and nighttime study.
+                </p>
+
+                {/* Visual Theme Preview Mockup */}
+                <div className="p-3 rounded-xl bg-slate-900/90 border border-cyan-500/20 shadow-inner flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2 w-16 rounded-full bg-cyan-400/80" />
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="p-2 rounded-lg bg-slate-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-slate-600 mb-1" />
+                      <div className="h-2.5 w-12 rounded-full bg-cyan-400/60" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-slate-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-slate-600 mb-1" />
+                      <div className="h-2.5 w-10 rounded-full bg-blue-400/60" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                <span>Palette: Slate • Cyan • Blue</span>
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    currentTheme === 'deep-space'
+                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                      : 'bg-white/5 text-white/70 group-hover:text-white'
+                  }`}
+                >
+                  {currentTheme === 'deep-space' ? 'Active Theme' : 'Select'}
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Card 2: Aurora */}
+            <div
+              id="theme-card-aurora"
+              onClick={() => setTheme('aurora')}
+              className={`group relative rounded-2xl p-5 border transition-all duration-300 cursor-pointer text-left flex flex-col justify-between ${
+                currentTheme === 'aurora'
+                  ? 'bg-neutral-950/90 border-fuchsia-500/60 shadow-lg shadow-fuchsia-500/15 ring-2 ring-fuchsia-500/40'
+                  : 'bg-neutral-950/40 border-white/10 hover:border-fuchsia-500/30 hover:bg-neutral-950/60'
               }`}
             >
-              <Sun className="w-5 h-5" /> Light Mode
-            </button>
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 shadow-sm shadow-fuchsia-400/50" />
+                    <h3 className="font-bold text-lg text-white group-hover:text-fuchsia-300 transition-colors">
+                      Aurora
+                    </h3>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20">
+                      Neon
+                    </span>
+                  </div>
+                  {currentTheme === 'aurora' && (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white flex items-center justify-center font-bold">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-neutral-300 mb-4 leading-relaxed">
+                  Neutral-950 backdrop illuminated by radiant neon violet and fuchsia highlights. Modern, vibrant, and energetic.
+                </p>
+
+                {/* Visual Theme Preview Mockup */}
+                <div className="p-3 rounded-xl bg-neutral-900/90 border border-fuchsia-500/20 shadow-inner flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2 w-16 rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-400" />
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-violet-400" />
+                      <div className="w-2 h-2 rounded-full bg-fuchsia-400" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="p-2 rounded-lg bg-neutral-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-neutral-600 mb-1" />
+                      <div className="h-2.5 w-12 rounded-full bg-violet-400/60" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-neutral-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-neutral-600 mb-1" />
+                      <div className="h-2.5 w-10 rounded-full bg-fuchsia-400/60" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-neutral-400">
+                <span>Palette: Neutral • Violet • Fuchsia</span>
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    currentTheme === 'aurora'
+                      ? 'bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/40'
+                      : 'bg-white/5 text-white/70 group-hover:text-white'
+                  }`}
+                >
+                  {currentTheme === 'aurora' ? 'Active Theme' : 'Select'}
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Card 3: Emerald Matrix */}
+            <div
+              id="theme-card-emerald"
+              onClick={() => setTheme('emerald')}
+              className={`group relative rounded-2xl p-5 border transition-all duration-300 cursor-pointer text-left flex flex-col justify-between ${
+                currentTheme === 'emerald'
+                  ? 'bg-zinc-950/90 border-emerald-500/60 shadow-lg shadow-emerald-500/15 ring-2 ring-emerald-500/40'
+                  : 'bg-zinc-950/40 border-white/10 hover:border-emerald-500/30 hover:bg-zinc-950/60'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 shadow-sm shadow-emerald-400/50" />
+                    <h3 className="font-bold text-lg text-white group-hover:text-emerald-300 transition-colors">
+                      Emerald Matrix
+                    </h3>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Matrix
+                    </span>
+                  </div>
+                  {currentTheme === 'emerald' && (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white flex items-center justify-center font-bold">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-zinc-300 mb-4 leading-relaxed">
+                  Deep zinc-950 charcoal background energized with fresh emerald green and mint highlights. Designed for endurance and crystal clarity.
+                </p>
+
+                {/* Visual Theme Preview Mockup */}
+                <div className="p-3 rounded-xl bg-zinc-900/90 border border-emerald-500/20 shadow-inner flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2 w-16 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" />
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                      <div className="w-2 h-2 rounded-full bg-teal-400" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="p-2 rounded-lg bg-zinc-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-zinc-600 mb-1" />
+                      <div className="h-2.5 w-12 rounded-full bg-emerald-400/60" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-zinc-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-zinc-600 mb-1" />
+                      <div className="h-2.5 w-10 rounded-full bg-teal-400/60" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-400">
+                <span>Palette: Zinc • Emerald • Mint</span>
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    currentTheme === 'emerald'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      : 'bg-white/5 text-white/70 group-hover:text-white'
+                  }`}
+                >
+                  {currentTheme === 'emerald' ? 'Active Theme' : 'Select'}
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Card 4: Crimson */}
+            <div
+              id="theme-card-crimson"
+              onClick={() => setTheme('crimson')}
+              className={`group relative rounded-2xl p-5 border transition-all duration-300 cursor-pointer text-left flex flex-col justify-between ${
+                currentTheme === 'crimson'
+                  ? 'bg-neutral-950/90 border-rose-500/60 shadow-lg shadow-rose-500/15 ring-2 ring-rose-500/40'
+                  : 'bg-neutral-950/40 border-white/10 hover:border-rose-500/30 hover:bg-neutral-950/60'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 shadow-sm shadow-rose-500/50" />
+                    <h3 className="font-bold text-lg text-white group-hover:text-rose-400 transition-colors">
+                      Crimson
+                    </h3>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                      Sunset
+                    </span>
+                  </div>
+                  {currentTheme === 'crimson' && (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 text-white flex items-center justify-center font-bold">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-neutral-300 mb-4 leading-relaxed">
+                  Strict dark neutral-950 foundation with fiery rose-600 and vivid orange-500 sunset gradients. Bold, intense, and high-contrast.
+                </p>
+
+                {/* Visual Theme Preview Mockup */}
+                <div className="p-3 rounded-xl bg-neutral-900/90 border border-rose-500/20 shadow-inner flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2 w-16 rounded-full bg-gradient-to-r from-rose-500 to-orange-500" />
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-rose-500" />
+                      <div className="w-2 h-2 rounded-full bg-orange-500" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="p-2 rounded-lg bg-neutral-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-neutral-600 mb-1" />
+                      <div className="h-2.5 w-12 rounded-full bg-rose-500/60" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-neutral-800/80 border border-white/5">
+                      <div className="h-1.5 w-8 rounded-full bg-neutral-600 mb-1" />
+                      <div className="h-2.5 w-10 rounded-full bg-orange-400/60" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-neutral-400">
+                <span>Palette: Neutral • Rose • Orange</span>
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    currentTheme === 'crimson'
+                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      : 'bg-white/5 text-white/70 group-hover:text-white'
+                  }`}
+                >
+                  {currentTheme === 'crimson' ? 'Active Theme' : 'Select'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

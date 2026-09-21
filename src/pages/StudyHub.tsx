@@ -196,7 +196,7 @@ export function StudyHub() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white shadow-lg shadow-[var(--glow-primary)]">
               <Globe className="w-5 h-5" />
             </div>
             <div>
@@ -212,7 +212,7 @@ export function StudyHub() {
         <button
           id="study-hub-add-resource-btn"
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-500 to-indigo-600 hover:from-brand-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 active:scale-95 transition-all duration-150 text-sm whitespace-nowrap"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-95 text-white font-semibold rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all duration-150 text-sm whitespace-nowrap"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>+ Add Resource</span>
@@ -230,7 +230,7 @@ export function StudyHub() {
               placeholder="Search platforms or websites..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-white/10 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-white/10 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all"
             />
             {searchQuery && (
               <button
@@ -250,13 +250,13 @@ export function StudyHub() {
       {/* Main Content Area */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-brand-400 mb-3" />
+          <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-primary)] mb-3" />
           <p className="text-sm">Loading your study resources...</p>
         </div>
       ) : filteredResources.length === 0 ? (
         /* Empty State */
         <div className="bg-slate-900 border border-white/10 rounded-2xl p-10 sm:p-14 text-center max-w-xl mx-auto shadow-xl">
-          <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 text-[var(--accent-primary)] flex items-center justify-center mx-auto mb-4">
             <Globe className="w-8 h-8" />
           </div>
           <h2 className="text-xl font-bold text-white mb-2">
@@ -278,7 +278,7 @@ export function StudyHub() {
             <button
               id="study-hub-empty-add-btn"
               onClick={handleOpenAdd}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-xl shadow-lg shadow-brand-500/20 transition-all text-sm"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 text-white font-medium rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all text-sm"
             >
               <Plus className="w-4 h-4" />
               <span>+ Add Your First Resource</span>
@@ -297,19 +297,19 @@ export function StudyHub() {
               <div
                 key={item.id}
                 id={`resource-card-${item.id}`}
-                className="group relative bg-slate-800/90 hover:bg-slate-750 border border-white/10 hover:border-brand-500/40 rounded-2xl p-5 transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-brand-500/10 hover:-translate-y-1 flex flex-col justify-between"
+                className="group relative bg-slate-800/90 hover:bg-slate-750 border border-white/10 hover:border-[var(--accent-primary)]/40 rounded-2xl p-5 transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-[var(--glow-primary)] hover:-translate-y-1 flex flex-col justify-between"
               >
                 {/* Clickable Card Link Area */}
                 <a
                   href={targetUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block focus:outline-none focus:ring-2 focus:ring-brand-500 rounded-xl"
+                  className="block focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] rounded-xl"
                   title={`Open ${item.platformName} (${targetUrl}) in new tab`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-4">
                     {/* Auto Favicon with Google Favicon API */}
-                    <div className="relative w-12 h-12 rounded-xl bg-slate-900 border border-white/10 p-2 flex items-center justify-center flex-shrink-0 group-hover:border-brand-500/30 transition-colors">
+                    <div className="relative w-12 h-12 rounded-xl bg-slate-900 border border-white/10 p-2 flex items-center justify-center flex-shrink-0 group-hover:border-[var(--accent-primary)]/30 transition-colors">
                       <img
                         src={faviconUrl}
                         alt={`${item.platformName} logo`}
@@ -321,7 +321,7 @@ export function StudyHub() {
                           const parent = e.currentTarget.parentElement;
                           if (parent && !parent.querySelector('.fallback-icon')) {
                             const fallback = document.createElement('div');
-                            fallback.className = 'fallback-icon text-brand-400 text-xs font-bold uppercase';
+                            fallback.className = 'fallback-icon text-[var(--accent-primary)] text-xs font-bold uppercase';
                             fallback.innerText = item.platformName.slice(0, 2);
                             parent.appendChild(fallback);
                           }
@@ -354,7 +354,7 @@ export function StudyHub() {
 
                   {/* Platform Title */}
                   <div className="mb-2">
-                    <h3 className="text-base font-semibold text-white group-hover:text-brand-300 transition-colors truncate">
+                    <h3 className="text-base font-semibold text-white group-hover:text-[var(--accent-primary)] transition-colors truncate">
                       {item.platformName}
                     </h3>
                     <p className="text-xs text-slate-400 truncate flex items-center gap-1 mt-0.5">
@@ -369,7 +369,7 @@ export function StudyHub() {
                     href={targetUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-400 hover:text-brand-300 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--accent-primary)] hover:opacity-80 transition-colors"
                   >
                     <span>Open Portal</span>
                     <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -397,7 +397,7 @@ export function StudyHub() {
             {/* Modal Header */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] flex items-center justify-center">
                   <Globe className="w-4 h-4" />
                 </div>
                 <div>
@@ -438,7 +438,7 @@ export function StudyHub() {
                   placeholder="e.g., Udvash, ACS, 10 Minute School"
                   value={platformName}
                   onChange={(e) => setPlatformName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-800 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-slate-800 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all"
                   autoFocus
                 />
               </div>
@@ -455,7 +455,7 @@ export function StudyHub() {
                   placeholder="e.g., https://udvash.com or online.acs.com.bd"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-800 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-slate-800 border border-white/10 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
                   Prefix with https:// is optional and added automatically if omitted.
@@ -476,7 +476,7 @@ export function StudyHub() {
                   id="study-hub-submit-btn"
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2 text-sm font-semibold bg-brand-500 hover:bg-brand-600 text-white rounded-xl shadow-lg shadow-brand-500/20 active:scale-95 transition-all disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-95 text-white rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all disabled:opacity-50"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                   <span>{editingResource ? 'Save Changes' : 'Add Resource'}</span>

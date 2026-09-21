@@ -47,29 +47,31 @@ export function DashboardLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white flex">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex transition-colors duration-300">
       {/* Unclosable Onboarding Modal for first-time users or missing class/group */}
       {user && !isAdmin && needsOnboarding && <OnboardingModal />}
       {/* Sidebar Desktop */}
-      <aside className="hidden md:flex flex-col w-64 bg-white/5 border-r border-white/10 p-4">
+      <aside className="hidden md:flex flex-col w-64 bg-[var(--card-bg)] backdrop-blur-xl border-r border-[var(--border-subtle)] p-4 transition-colors duration-300">
         <div className="flex items-center gap-3 mb-10 px-2 pt-2">
-          <div className="w-8 h-8 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-[var(--glow-primary)]">
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <span className="text-xl font-bold tracking-tight block leading-tight">Trackademics</span>
-            <span className="text-[10px] text-slate-400 block font-medium">SSC to Admission</span>
+            <span className="text-xl font-bold tracking-tight block leading-tight text-[var(--text-main)]">Trackademics</span>
+            <span className="text-[10px] text-[var(--text-muted)] block font-medium">SSC to Admission</span>
           </div>
         </div>
 
-        <nav className="flex-1 flex flex-col gap-2">
+        <nav className="flex-1 flex flex-col gap-1.5 overflow-y-auto pr-1">
           {navItems.map(item => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) => 
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors ${
-                  isActive ? 'bg-brand-500/20 text-brand-400' : 'text-white/70 hover:bg-white/10 hover:text-white'
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                  isActive 
+                    ? 'bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 font-semibold shadow-sm' 
+                    : 'text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-main)]'
                 }`
               }
             >
@@ -79,16 +81,16 @@ export function DashboardLayout() {
           ))}
         </nav>
 
-        <div className="mt-auto border-t border-white/10 pt-4 flex flex-col gap-3">
-          <div className="px-3 text-sm text-white/60">
-            <div className="font-medium text-white">{dbUser?.name}</div>
+        <div className="mt-auto border-t border-[var(--border-subtle)] pt-4 flex flex-col gap-3">
+          <div className="px-3 text-sm text-[var(--text-muted)]">
+            <div className="font-medium text-[var(--text-main)]">{dbUser?.name}</div>
             <div className="text-xs">
               {formatClassName(dbUser?.class)} {dbUser?.group ? `• ${formatGroupName(dbUser.group)} Group` : ''}
             </div>
           </div>
           <button 
             onClick={logOut}
-            className="flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-white/10 rounded-xl transition-colors text-sm font-medium"
+            className="flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-white/10 rounded-xl transition-colors text-sm font-medium cursor-pointer"
           >
             <LogOut className="w-5 h-5" />
             Logout
@@ -97,23 +99,23 @@ export function DashboardLayout() {
       </aside>
 
       {/* Mobile Header & Overlay */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between p-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--bg-main)]/90 backdrop-blur-md border-b border-[var(--border-subtle)] flex items-center justify-between p-4 transition-colors duration-300">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-[var(--glow-primary)]">
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <span className="text-lg font-bold block leading-none">Trackademics</span>
-            <span className="text-[9px] text-slate-400 block font-medium">SSC to Admission</span>
+            <span className="text-lg font-bold block leading-none text-[var(--text-main)]">Trackademics</span>
+            <span className="text-[9px] text-[var(--text-muted)] block font-medium">SSC to Admission</span>
           </div>
         </div>
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-[var(--text-main)]">
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 top-[73px] z-40 bg-[#0f172a] flex flex-col p-4 overflow-y-auto">
+        <div className="md:hidden fixed inset-0 top-[73px] z-40 bg-[var(--bg-main)] flex flex-col p-4 overflow-y-auto transition-colors duration-300">
            <nav className="flex-1 flex flex-col gap-2">
             {navItems.map(item => (
               <NavLink
@@ -121,8 +123,10 @@ export function DashboardLayout() {
                 to={item.to}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) => 
-                  `flex items-center gap-3 px-3 py-3 rounded-xl transition-colors ${
-                    isActive ? 'bg-brand-500/20 text-brand-400' : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  `flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30 font-semibold shadow-sm' 
+                      : 'text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-main)]'
                   }`
                 }
               >
@@ -131,16 +135,16 @@ export function DashboardLayout() {
               </NavLink>
             ))}
           </nav>
-          <div className="mt-8 border-t border-white/10 pt-4 flex flex-col gap-4">
+          <div className="mt-8 border-t border-[var(--border-subtle)] pt-4 flex flex-col gap-4">
              <div className="px-3">
-              <div className="font-medium text-white">{dbUser?.name}</div>
-              <div className="text-sm text-white/60">
+              <div className="font-medium text-[var(--text-main)]">{dbUser?.name}</div>
+              <div className="text-sm text-[var(--text-muted)]">
                 {formatClassName(dbUser?.class)} {dbUser?.group ? `• ${formatGroupName(dbUser.group)} Group` : ''}
               </div>
             </div>
             <button 
               onClick={logOut}
-              className="flex items-center gap-3 px-3 py-3 text-red-400 hover:bg-white/10 rounded-xl transition-colors font-medium"
+              className="flex items-center gap-3 px-3 py-3 text-red-400 hover:bg-white/10 rounded-xl transition-colors font-medium cursor-pointer"
             >
               <LogOut className="w-5 h-5" />
               Logout
@@ -150,7 +154,7 @@ export function DashboardLayout() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 relative overflow-y-auto w-full pt-[73px] md:pt-0">
+      <main className="flex-1 relative overflow-y-auto w-full pt-[73px] md:pt-0 bg-[var(--bg-main)] transition-colors duration-300">
          <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
             <Outlet />
          </div>

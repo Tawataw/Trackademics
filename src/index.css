@@ -1,15 +1,75 @@
 @import './styles/theme.css';
-@import './styles/theme.css';
 @import "tailwindcss";
 
+/* 1. Theme CSS Variables */
+:root {
+  /* "Deep Space" Theme (Default: slate-950 background, cyan/blue accents, slate-900/50 cards) */
+  --bg-main: #020617;
+  --card-bg: rgba(15, 23, 42, 0.5);
+  --card-bg-solid: #0f172a;
+  --accent-primary: #06b6d4;
+  --accent-secondary: #3b82f6;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --glow-primary: rgba(6, 182, 212, 0.25);
+}
+
+.theme-aurora {
+  /* "Aurora" Theme (neutral-950 background, violet/fuchsia accents, neutral-900/50 cards) */
+  --bg-main: #0a0a0a;
+  --card-bg: rgba(23, 23, 23, 0.5);
+  --card-bg-solid: #171717;
+  --accent-primary: #8b5cf6;
+  --accent-secondary: #d946ef;
+  --text-main: #fafafa;
+  --text-muted: #a3a3a3;
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --glow-primary: rgba(217, 70, 239, 0.25);
+}
+
+.theme-emerald {
+  /* "Emerald Matrix" Theme (zinc-950 background, emerald/mint accents, zinc-900/50 cards) */
+  --bg-main: #09090b;
+  --card-bg: rgba(24, 24, 27, 0.5);
+  --card-bg-solid: #18181b;
+  --accent-primary: #10b981;
+  --accent-secondary: #34d399;
+  --text-main: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --glow-primary: rgba(16, 185, 129, 0.25);
+}
+
+.theme-crimson {
+  /* "Crimson" Theme (neutral-950 background, rose-600 to orange-500 sunset accents, neutral-900/50 cards) */
+  --bg-main: #0a0a0a;
+  --card-bg: rgba(23, 23, 23, 0.5);
+  --card-bg-solid: #171717;
+  --accent-primary: #e11d48;
+  --accent-secondary: #f97316;
+  --text-main: #fafafa;
+  --text-muted: #a3a3a3;
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --glow-primary: rgba(225, 29, 72, 0.25);
+}
+
 @theme {
+  --color-bg-main: var(--bg-main);
+  --color-card-bg: var(--card-bg);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-subtle: var(--border-subtle);
+
   --color-brand-50: #eef2ff;
   --color-brand-100: #e0e7ff;
   --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
+  --color-brand-300: var(--accent-secondary);
+  --color-brand-400: var(--accent-secondary);
+  --color-brand-500: var(--accent-primary);
+  --color-brand-600: var(--accent-primary);
   --color-brand-900: #312e81;
   
   --color-surface-900: rgba(255, 255, 255, 0.02);
@@ -19,11 +79,54 @@
 
 @layer base {
   body {
-    @apply bg-[#0f172a] text-white antialiased selection:bg-brand-500 selection:text-white;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    @apply antialiased selection:bg-brand-500 selection:text-white transition-colors duration-300;
   }
 }
 
+/* Glassmorphism styling preserving transparency across themes */
 .glass-panel {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl;
+  background-color: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
+/* Dynamic theme adaptors for seamless background synchronization */
+.theme-aurora .bg-\[\#0f172a\] {
+  background-color: var(--bg-main) !important;
+}
+
+.theme-aurora .bg-\[\#1e293b\] {
+  background-color: var(--card-bg-solid) !important;
+}
+
+.theme-aurora .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.theme-emerald .bg-\[\#0f172a\] {
+  background-color: var(--bg-main) !important;
+}
+
+.theme-emerald .bg-\[\#1e293b\] {
+  background-color: var(--card-bg-solid) !important;
+}
+
+.theme-emerald .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.theme-crimson .bg-\[\#0f172a\] {
+  background-color: var(--bg-main) !important;
+}
+
+.theme-crimson .bg-\[\#1e293b\] {
+  background-color: var(--card-bg-solid) !important;
+}
+
+.theme-crimson .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}

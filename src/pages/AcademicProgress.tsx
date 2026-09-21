@@ -148,7 +148,7 @@ export function AcademicProgress() {
               setErrorMessage(null);
               setShowAddModal(true);
             }}
-            className="bg-brand-500 hover:bg-brand-600 transition-colors px-4 py-2.5 rounded-xl flex items-center gap-2 font-semibold shadow-lg shadow-brand-500/20 text-sm whitespace-nowrap cursor-pointer"
+            className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 border border-white/10 transition-all px-4 py-2.5 rounded-xl flex items-center gap-2 font-semibold shadow-lg shadow-[var(--glow-primary)] text-sm whitespace-nowrap cursor-pointer text-white"
           >
             <Plus className="w-4 h-4" /> Add Exam
           </button>
@@ -157,7 +157,7 @@ export function AcademicProgress() {
             to="/legacy-calculator"
             className="bg-white/10 hover:bg-white/20 border border-white/10 transition-colors px-4 py-2.5 rounded-xl flex items-center gap-2 font-semibold text-sm whitespace-nowrap"
           >
-            <Calculator className="w-4 h-4 text-brand-400" /> Subject Calculator
+            <Calculator className="w-4 h-4 text-[var(--accent-primary)]" /> Subject Calculator
           </Link>
         </div>
       </div>
@@ -173,7 +173,7 @@ export function AcademicProgress() {
       {/* Main Content */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3 text-white/50">
-          <Loader2 className="w-8 h-8 animate-spin text-brand-400" />
+          <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-primary)]" />
           <p className="text-sm">Fetching exam records from Firestore...</p>
         </div>
       ) : exams.length === 0 ? (
@@ -184,7 +184,7 @@ export function AcademicProgress() {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => setShowAddModal(true)}
-              className="bg-brand-500 hover:bg-brand-600 transition-colors text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2"
+              className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer"
             >
               <Plus className="w-5 h-5" /> Add Exam Record
             </button>
@@ -192,7 +192,7 @@ export function AcademicProgress() {
               to="/legacy-calculator" 
               className="bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-colors px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2"
             >
-              <Calculator className="w-5 h-5 text-brand-400" /> Use Calculator
+              <Calculator className="w-5 h-5 text-[var(--accent-primary)]" /> Use Calculator
             </Link>
           </div>
         </div>
@@ -220,7 +220,7 @@ export function AcademicProgress() {
 
               <div className="flex justify-between items-start pr-8">
                 <div>
-                  <span className="text-xs font-semibold px-2.5 py-1 bg-brand-500/20 text-brand-300 rounded-md border border-brand-500/30 inline-block mb-1">
+                  <span className="text-xs font-semibold px-2.5 py-1 bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] rounded-md border border-[var(--accent-primary)]/30 inline-block mb-1">
                     {exam.class}
                   </span>
                   <div className="text-xl font-bold text-white mt-1">{exam.examType}</div>
@@ -238,7 +238,7 @@ export function AcademicProgress() {
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10 mt-1">
                 <div>
                   <div className="text-xs text-white/50 mb-0.5">GPA</div>
-                  <div className="text-2xl font-bold text-brand-400">{exam.GPA ? exam.GPA.toFixed(2) : '0.00'}</div>
+                  <div className="text-2xl font-bold text-[var(--accent-primary)]">{exam.GPA ? exam.GPA.toFixed(2) : '0.00'}</div>
                 </div>
                 <div>
                   <div className="text-xs text-white/50 mb-0.5">Total Marks</div>
@@ -256,7 +256,7 @@ export function AcademicProgress() {
           <div className="bg-[#1e293b] border border-white/15 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative flex flex-col gap-5 text-white">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-brand-500/20 border border-brand-500/30 rounded-lg flex items-center justify-center text-brand-400">
+                <div className="w-8 h-8 bg-[var(--accent-primary)]/20 border border-[var(--accent-primary)]/30 rounded-lg flex items-center justify-center text-[var(--accent-primary)]">
                   <Plus className="w-4 h-4" />
                 </div>
                 <h2 className="text-lg font-bold">Add Examination Record</h2>
@@ -282,7 +282,7 @@ export function AcademicProgress() {
                   <select
                     value={formClass}
                     onChange={e => setFormClass(e.target.value)}
-                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--accent-primary)]"
                   >
                     <option value="Class 11">Class 11</option>
                     <option value="Class 12">Class 12</option>
@@ -295,7 +295,7 @@ export function AcademicProgress() {
                   <select
                     value={formExamType}
                     onChange={e => setFormExamType(e.target.value)}
-                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--accent-primary)]"
                   >
                     <option value="Half-Yearly">Half-Yearly</option>
                     <option value="Yearly">Yearly</option>
@@ -315,7 +315,7 @@ export function AcademicProgress() {
                     value={formDate}
                     onChange={e => setFormDate(e.target.value)}
                     required
-                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -324,7 +324,7 @@ export function AcademicProgress() {
                   <select
                     value={formStatus}
                     onChange={e => setFormStatus(e.target.value as 'Pass' | 'Fail')}
-                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--accent-primary)]"
                   >
                     <option value="Pass">Pass</option>
                     <option value="Fail">Fail</option>
@@ -344,7 +344,7 @@ export function AcademicProgress() {
                     onChange={e => setFormGPA(e.target.value)}
                     required
                     placeholder="5.00"
-                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -359,7 +359,7 @@ export function AcademicProgress() {
                     onChange={e => setFormTotalMarks(e.target.value)}
                     required
                     placeholder="1100"
-                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500"
+                    className="w-full bg-[#0f172a] border border-white/20 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--accent-primary)]"
                   />
                 </div>
               </div>
@@ -375,7 +375,7 @@ export function AcademicProgress() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-brand-500 hover:bg-brand-600 disabled:opacity-50 px-5 py-2.5 rounded-xl text-white text-sm font-bold flex items-center gap-2 shadow-lg shadow-brand-500/25 transition-colors cursor-pointer"
+                  className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 disabled:opacity-50 px-5 py-2.5 rounded-xl text-white text-sm font-bold flex items-center gap-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all cursor-pointer"
                 >
                   {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                   Save Exam to Cloud

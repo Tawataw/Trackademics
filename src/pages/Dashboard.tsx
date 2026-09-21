@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useTrackerStore } from '../store/useTrackerStore';
 import { dbApi, ExamRecord, SyllabusProgress, StudySession } from '../lib/db';
 import { calculateOverallSyllabusProgress } from '../config/syllabus';
@@ -10,6 +11,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 export function Dashboard() {
   const { user, dbUser } = useAuth();
+  const { currentTheme } = useTheme();
   const storeGroup = useTrackerStore(state => state.group);
   
   const [exams, setExams] = useState<ExamRecord[]>([]);
@@ -66,6 +68,8 @@ export function Dashboard() {
   );
   const displaySyllabusCompleted = Number.isInteger(overallCompleted) ? overallCompleted : Number(overallCompleted.toFixed(1));
 
+  const chartColor = currentTheme === 'emerald' ? '#10b981' : currentTheme === 'aurora' ? '#d946ef' : '#06b6d4';
+
   const chartData = [...exams].reverse().map(e => ({
     name: `${e.class} ${e.examType}`,
     GPA: e.GPA,
@@ -76,7 +80,7 @@ export function Dashboard() {
     <div className="flex flex-col gap-8 text-white">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 text-[var(--accent-primary)] text-xs font-semibold mb-2">
             Trackademics • Academic Management Ecosystem
           </div>
           <h1 className="text-3xl font-bold">Welcome to Trackademics, {dbUser?.name || 'Student'}</h1>
@@ -91,7 +95,7 @@ export function Dashboard() {
         </div>
         <Link 
           to="/academic" 
-          className="bg-brand-500 hover:bg-brand-600 transition-colors px-4 py-2 rounded-xl flex items-center gap-2 font-medium w-fit"
+          className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 shadow-md shadow-[var(--glow-primary)] border border-white/10 transition-all px-4 py-2 rounded-xl flex items-center gap-2 font-medium w-fit text-white cursor-pointer"
         >
           <Plus className="w-5 h-5" /> Add Exam Result
         </Link>
@@ -119,7 +123,7 @@ export function Dashboard() {
 
         <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-2">
           <div className="flex items-center gap-3 text-white/70">
-            <BookOpen className="w-5 h-5 text-green-400" />
+            <BookOpen className="w-5 h-5 text-emerald-400" />
             <span className="font-medium">Syllabus</span>
           </div>
           <div className="text-3xl font-bold">{syllabusPercent}%</div>
@@ -140,7 +144,7 @@ export function Dashboard() {
         {/* Performance Chart */}
         <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6">
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-brand-400" /> Academic Performance
+            <TrendingUp className="w-5 h-5 text-[var(--accent-primary)]" /> Academic Performance
           </h2>
           {exams.length > 0 ? (
             <div className="h-72 w-full">
@@ -150,10 +154,10 @@ export function Dashboard() {
                   <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" tick={{ fill: 'rgba(255,255,255,0.5)' }} />
                   <YAxis yAxisId="left" stroke="rgba(255,255,255,0.2)" tick={{ fill: 'rgba(255,255,255,0.5)' }} domain={[0, 5]} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '0.75rem' }} 
-                    itemStyle={{ color: '#fff' }} 
+                    contentStyle={{ backgroundColor: 'var(--card-bg-solid, #1e293b)', borderColor: 'var(--border-subtle, rgba(255,255,255,0.1))', borderRadius: '0.75rem', color: 'var(--text-main, #fff)' }} 
+                    itemStyle={{ color: 'var(--text-main, #fff)' }} 
                   />
-                  <Line yAxisId="left" type="monotone" dataKey="GPA" stroke="#3b82f6" strokeWidth={3} dot={{ r: 6, fill: '#3b82f6' }} activeDot={{ r: 8 }} />
+                  <Line yAxisId="left" type="monotone" dataKey="GPA" stroke={chartColor} strokeWidth={3} dot={{ r: 6, fill: chartColor }} activeDot={{ r: 8, fill: chartColor }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -161,7 +165,7 @@ export function Dashboard() {
             <div className="h-72 flex flex-col items-center justify-center text-white/40">
               <TrendingUp className="w-12 h-12 mb-3 opacity-20" />
               <p>No exam data available yet</p>
-              <Link to="/academic" className="text-brand-400 mt-2 hover:underline">Add Exam Result</Link>
+              <Link to="/academic" className="text-[var(--accent-primary)] mt-2 hover:underline">Add Exam Result</Link>
             </div>
           )}
         </div>
