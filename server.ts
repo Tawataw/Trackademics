@@ -11,25 +11,27 @@ app.use(express.json());
 // API route for Xerneas AI Mentor
 app.post('/api/gemini/mentor', async (req, res) => {
   try {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(400).json({ error: 'GEMINI_API_KEY is not configured.' });
-    }
     const { prompt } = req.body;
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      }
-    );
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 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'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ]
+      })
+    });
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
@@ -37,10 +39,10 @@ app.post('/api/gemini/mentor', async (req, res) => {
     }
 
     const data: any = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const text = data.choices?.[0]?.message?.content || '';
     return res.json({ text });
   } catch (err: any) {
-    console.error('Gemini mentor server error:', err);
+    console.error('Mentor server error:', err);
     return res.status(500).json({ error: err.message || 'Failed to generate mentor feedback' });
   }
 });

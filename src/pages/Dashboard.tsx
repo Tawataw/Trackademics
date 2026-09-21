@@ -76,9 +76,17 @@ export function Dashboard() {
     <div className="flex flex-col gap-8 text-white">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Welcome back, {dbUser?.name}</h1>
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-2">
+            Trackademics • Academic Management Ecosystem
+          </div>
+          <h1 className="text-3xl font-bold">Welcome to Trackademics, {dbUser?.name || 'Student'}</h1>
           <p className="text-white/60 mt-1">
-            {formatClassName(dbUser?.class)} {activeGroup ? `• ${formatGroupName(activeGroup)} Group` : ''}
+            Empowering SSC, HSC, and Admission students with comprehensive academic analytics, syllabus tracking, and study management.
+            {dbUser?.class && (
+              <span className="block text-slate-400 text-xs mt-1">
+                {formatClassName(dbUser?.class)} {activeGroup ? `• ${formatGroupName(activeGroup)} Group` : ''}
+              </span>
+            )}
           </p>
         </div>
         <Link 

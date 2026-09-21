@@ -1,6 +1,6 @@
 {
-  "name": "HSC Tracker 2.0",
-  "description": "Calculate GPA, track syllabus progress, manage study sessions, check university admission eligibility, and store academic records in Firebase Firestore.",
+  "name": "Trackademics",
+  "description": "Academic Management Ecosystem for SSC to Admission students. Calculate GPA, track syllabus progress, manage study sessions, check admission eligibility, and store academic records in Firebase Firestore.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

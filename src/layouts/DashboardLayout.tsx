@@ -53,10 +53,13 @@ export function DashboardLayout() {
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-white/5 border-r border-white/10 p-4">
         <div className="flex items-center gap-3 mb-10 px-2 pt-2">
-          <div className="w-8 h-8 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-bold">HSC Tracker</span>
+          <div>
+            <span className="text-xl font-bold tracking-tight block leading-tight">Trackademics</span>
+            <span className="text-[10px] text-slate-400 block font-medium">SSC to Admission</span>
+          </div>
         </div>
 
         <nav className="flex-1 flex flex-col gap-2">
@@ -96,10 +99,13 @@ export function DashboardLayout() {
       {/* Mobile Header & Overlay */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
             <GraduationCap className="w-5 h-5 text-white" />
           </div>
-          <span className="text-lg font-bold">HSC Tracker</span>
+          <div>
+            <span className="text-lg font-bold block leading-none">Trackademics</span>
+            <span className="text-[9px] text-slate-400 block font-medium">SSC to Admission</span>
+          </div>
         </div>
         <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2">
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

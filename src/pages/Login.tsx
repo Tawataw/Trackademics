@@ -61,9 +61,9 @@ export function Login() {
         <div className="w-16 h-16 bg-gradient-to-tr from-brand-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg mb-6 shadow-brand-500/10">
           <GraduationCap className="w-10 h-10 text-white" />
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">HSC Tracker 2.0</h1>
+        <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Trackademics</h1>
         <p className="text-white/60 text-center mb-10 max-w-md text-sm sm:text-base">
-          Calculate your GPA, track your syllabus progress, and store your academic records in the cloud.
+          Academic Management Ecosystem for SSC to Admission students. Calculate your GPA, track your syllabus progress, and store your academic records in the cloud.
         </p>
         
         {view === 'options' && (
