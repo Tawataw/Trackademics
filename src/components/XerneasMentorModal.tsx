@@ -377,8 +377,8 @@ Instruction: Use this context naturally if the user asks about themselves, their
                 messages.map(msg => (
                   <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                     <div className="flex items-start gap-2.5 max-w-[88%]">
-                      {msg.sender === 'assistant' && <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white flex-shrink-0 mt-0.5 shadow-sm"><Bot className="w-3.5 h-3.5" /></div>}
-                      <div className={`p-3.5 rounded-2xl text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white shadow-md' : 'bg-[var(--card-bg)] border border-[var(--border-subtle)] text-[var(--text-main)] shadow-sm'}`}>
+                      {msg.sender === 'assistant' && <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-primary-foreground flex-shrink-0 mt-0.5 shadow-sm"><Bot className="w-3.5 h-3.5" /></div>}
+                      <div className={`p-3.5 rounded-2xl text-sm leading-relaxed ${msg.sender === 'user' ? 'bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-primary-foreground shadow-md' : 'bg-[var(--card-bg)] border border-[var(--border-subtle)] text-[var(--text-main)] shadow-sm'}`}>
                         {msg.isAnalysis && msg.sender === 'assistant' && <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-400 mb-1.5 pb-1 border-b border-white/10"><Sparkles className="w-3.5 h-3.5" /> Xerneas Progress Assessment</div>}
                         <p className="whitespace-pre-wrap font-sans">{msg.text}</p>
                       </div>
@@ -388,7 +388,7 @@ Instruction: Use this context naturally if the user asks about themselves, their
               )}
               {analyzing && (
                 <div className="flex items-start gap-2.5 max-w-[85%]">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-white flex-shrink-0 mt-0.5 animate-pulse"><Bot className="w-3.5 h-3.5" /></div>
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] flex items-center justify-center text-primary-foreground flex-shrink-0 mt-0.5 animate-pulse"><Bot className="w-3.5 h-3.5" /></div>
                   <div className="p-3.5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-subtle)] text-[var(--text-muted)] text-sm flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin text-[var(--accent-primary)]" /><span>Xerneas is analyzing data...</span></div>
                 </div>
               )}
@@ -408,7 +408,7 @@ Instruction: Use this context naturally if the user asks about themselves, their
               <button
                 type="submit"
                 disabled={!inputValue.trim() || analyzing}
-                className="p-3 rounded-xl bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-white shadow-md shadow-[var(--glow-primary)] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center flex-shrink-0 cursor-pointer"
+                className="p-3 rounded-xl bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] text-primary-foreground shadow-md shadow-[var(--glow-primary)] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center flex-shrink-0 cursor-pointer"
               >
                 <Send className="w-5 h-5" />
               </button>

@@ -212,7 +212,7 @@ export function StudyHub() {
         <button
           id="study-hub-add-resource-btn"
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-95 text-white font-semibold rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all duration-150 text-sm whitespace-nowrap"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-95 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all duration-150 text-sm whitespace-nowrap cursor-pointer"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>+ Add Resource</span>
@@ -278,7 +278,7 @@ export function StudyHub() {
             <button
               id="study-hub-empty-add-btn"
               onClick={handleOpenAdd}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 text-white font-medium rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all text-sm"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 text-primary-foreground font-medium rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all text-sm cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>+ Add Your First Resource</span>
@@ -476,7 +476,7 @@ export function StudyHub() {
                   id="study-hub-submit-btn"
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-95 text-white rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2 text-sm font-semibold bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-95 text-primary-foreground rounded-xl shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                   <span>{editingResource ? 'Save Changes' : 'Add Resource'}</span>

@@ -54,7 +54,7 @@ export function DashboardLayout() {
       <aside className="hidden md:flex flex-col w-64 bg-[var(--card-bg)] backdrop-blur-xl border-r border-[var(--border-subtle)] p-4 transition-colors duration-300">
         <div className="flex items-center gap-3 mb-10 px-2 pt-2">
           <div className="w-8 h-8 bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-[var(--glow-primary)]">
-            <GraduationCap className="w-5 h-5 text-white" />
+            <GraduationCap className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
             <span className="text-xl font-bold tracking-tight block leading-tight text-[var(--text-main)]">Trackademics</span>
@@ -102,7 +102,7 @@ export function DashboardLayout() {
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[var(--bg-main)]/90 backdrop-blur-md border-b border-[var(--border-subtle)] flex items-center justify-between p-4 transition-colors duration-300">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-tr from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-[var(--glow-primary)]">
-            <GraduationCap className="w-5 h-5 text-white" />
+            <GraduationCap className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
             <span className="text-lg font-bold block leading-none text-[var(--text-main)]">Trackademics</span>

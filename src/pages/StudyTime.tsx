@@ -55,7 +55,7 @@ export function StudyTime() {
   const todayMins = chartData[6].minutes;
   const totalMins = sessions.reduce((acc, curr) => acc + curr.durationMinutes, 0);
 
-  const chartColor = currentTheme === 'emerald' ? '#10b981' : currentTheme === 'aurora' ? '#d946ef' : currentTheme === 'crimson' ? '#e11d48' : '#06b6d4';
+  const chartColor = currentTheme === 'emerald' ? '#10b981' : currentTheme === 'aurora' ? '#d946ef' : currentTheme === 'crimson' ? '#e11d48' : currentTheme === 'minimalist' ? '#ffffff' : currentTheme === 'cyberpunk' ? '#facc15' : currentTheme === 'ocean' ? '#2dd4bf' : '#06b6d4';
 
   return (
     <div className="flex flex-col gap-8 text-white max-w-5xl mx-auto">
@@ -79,7 +79,7 @@ export function StudyTime() {
             />
             <button 
               onClick={handleAddSession}
-              className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 mt-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10"
+              className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-primary-foreground font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 mt-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10 cursor-pointer"
             >
               <Plus className="w-5 h-5" /> Add Study Time
             </button>

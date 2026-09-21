@@ -250,12 +250,12 @@ export function Settings() {
           </div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/80 border border-white/10 w-fit">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            Active: <span className="text-white capitalize">{currentTheme === 'aurora' ? 'Aurora' : currentTheme === 'emerald' ? 'Emerald Matrix' : currentTheme === 'crimson' ? 'Crimson' : 'Deep Space'}</span>
+            Active: <span className="text-white capitalize">{currentTheme === 'aurora' ? 'Aurora' : currentTheme === 'emerald' ? 'Emerald Matrix' : currentTheme === 'crimson' ? 'Crimson' : currentTheme === 'minimalist' ? 'Minimalist' : currentTheme === 'cyberpunk' ? 'Cyberpunk' : currentTheme === 'ocean' ? 'Ocean' : 'Deep Space'}</span>
           </span>
         </div>
         
         <div className="p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-5">
             {/* Theme Card 1: Deep Space */}
             <div
               id="theme-card-deep-space"
@@ -528,6 +528,213 @@ export function Settings() {
                   }`}
                 >
                   {currentTheme === 'crimson' ? 'Active Theme' : 'Select'}
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Card 5: Minimalist */}
+            <div
+              id="theme-card-minimalist"
+              onClick={() => setTheme('minimalist')}
+              className={`group relative rounded-2xl p-5 border transition-all duration-300 cursor-pointer text-left flex flex-col justify-between ${
+                currentTheme === 'minimalist'
+                  ? 'bg-black border-white shadow-lg shadow-white/10 ring-2 ring-white/50'
+                  : 'bg-black/60 border-white/10 hover:border-white/30 hover:bg-black/90'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-white shadow-sm shadow-white/40 border border-zinc-400" />
+                    <h3 className="font-bold text-lg text-white group-hover:text-zinc-200 transition-colors">
+                      Minimalist
+                    </h3>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/20">
+                      Mono
+                    </span>
+                  </div>
+                  {currentTheme === 'minimalist' && (
+                    <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center font-bold shadow-sm">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-zinc-400 mb-4 leading-relaxed">
+                  Distraction-free pure black canvas with zinc-900 cards and crisp, high-contrast solid white accents. Zero color clutter.
+                </p>
+
+                {/* Visual Theme Preview Mockup */}
+                <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 shadow-inner flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2 w-16 rounded-full bg-white" />
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-white" />
+                      <div className="w-2 h-2 rounded-full bg-zinc-400" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+                      <div className="h-1.5 w-8 rounded-full bg-zinc-600 mb-1" />
+                      <div className="h-2.5 w-12 rounded-full bg-white" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+                      <div className="h-1.5 w-8 rounded-full bg-zinc-600 mb-1" />
+                      <div className="h-2.5 w-10 rounded-full bg-zinc-400" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-zinc-400">
+                <span>Palette: Black • Zinc • White</span>
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    currentTheme === 'minimalist'
+                      ? 'bg-white text-black font-semibold'
+                      : 'bg-white/5 text-white/70 group-hover:text-white'
+                  }`}
+                >
+                  {currentTheme === 'minimalist' ? 'Active Theme' : 'Select'}
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Card 6: Cyberpunk */}
+            <div
+              id="theme-card-cyberpunk"
+              onClick={() => setTheme('cyberpunk')}
+              className={`group relative rounded-2xl p-5 border transition-all duration-300 cursor-pointer text-left flex flex-col justify-between ${
+                currentTheme === 'cyberpunk'
+                  ? 'bg-slate-950 border-yellow-400 shadow-lg shadow-yellow-400/20 ring-2 ring-yellow-400/50'
+                  : 'bg-slate-950/60 border-slate-800 hover:border-yellow-400/40 hover:bg-slate-950/90'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-yellow-400 to-pink-500 shadow-sm shadow-yellow-400/50" />
+                    <h3 className="font-bold text-lg text-white group-hover:text-yellow-300 transition-colors">
+                      Cyberpunk
+                    </h3>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
+                      Neon
+                    </span>
+                  </div>
+                  {currentTheme === 'cyberpunk' && (
+                    <div className="w-6 h-6 rounded-full bg-yellow-400 text-black flex items-center justify-center font-bold shadow-sm">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+                  Edgy Gen-Z aesthetic with deep slate-950, high-contrast neon yellow-400 & electric hot pink accents. Razor-sharp visibility.
+                </p>
+
+                {/* Visual Theme Preview Mockup */}
+                <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 shadow-inner flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2 w-16 rounded-full bg-gradient-to-r from-yellow-400 to-pink-500" />
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                      <div className="w-2 h-2 rounded-full bg-pink-500" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                      <div className="h-1.5 w-8 rounded-full bg-slate-700 mb-1" />
+                      <div className="h-2.5 w-12 rounded-full bg-yellow-400" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-slate-950 border border-slate-800">
+                      <div className="h-1.5 w-8 rounded-full bg-slate-700 mb-1" />
+                      <div className="h-2.5 w-10 rounded-full bg-pink-500" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
+                <span>Palette: Slate-950 • Neon • Pink</span>
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    currentTheme === 'cyberpunk'
+                      ? 'bg-gradient-to-r from-yellow-400 to-pink-500 text-black font-bold'
+                      : 'bg-white/5 text-white/70 group-hover:text-white'
+                  }`}
+                >
+                  {currentTheme === 'cyberpunk' ? 'Active Theme' : 'Select'}
+                </button>
+              </div>
+            </div>
+
+            {/* Theme Card 7: Ocean */}
+            <div
+              id="theme-card-ocean"
+              onClick={() => setTheme('ocean')}
+              className={`group relative rounded-2xl p-5 border transition-all duration-300 cursor-pointer text-left flex flex-col justify-between ${
+                currentTheme === 'ocean'
+                  ? 'bg-teal-950/80 border-cyan-400 shadow-lg shadow-cyan-400/20 ring-2 ring-cyan-400/50'
+                  : 'bg-teal-950/30 border-teal-900/60 hover:border-cyan-400/40 hover:bg-teal-950/60'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-cyan-400 to-teal-400 shadow-sm shadow-cyan-400/50" />
+                    <h3 className="font-bold text-lg text-white group-hover:text-cyan-300 transition-colors">
+                      Ocean
+                    </h3>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/20">
+                      Bioluminescent
+                    </span>
+                  </div>
+                  {currentTheme === 'ocean' && (
+                    <div className="w-6 h-6 rounded-full bg-cyan-400 text-slate-950 flex items-center justify-center font-bold shadow-sm">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-teal-100/70 mb-4 leading-relaxed">
+                  Calming deep oceanic aesthetic with teal-900/30 glassmorphism, soft aqua & teal accents, and tranquil bioluminescent glow.
+                </p>
+
+                {/* Visual Theme Preview Mockup */}
+                <div className="p-3 rounded-xl bg-teal-950/70 border border-teal-800/40 shadow-inner flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2 w-16 rounded-full bg-gradient-to-r from-cyan-400 to-teal-400" />
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-cyan-400" />
+                      <div className="w-2 h-2 rounded-full bg-teal-400" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div className="p-2 rounded-lg bg-teal-900/40 border border-teal-800/40">
+                      <div className="h-1.5 w-8 rounded-full bg-teal-700/60 mb-1" />
+                      <div className="h-2.5 w-12 rounded-full bg-cyan-400" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-teal-900/40 border border-teal-800/40">
+                      <div className="h-1.5 w-8 rounded-full bg-teal-700/60 mb-1" />
+                      <div className="h-2.5 w-10 rounded-full bg-teal-400" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-teal-800/30 flex items-center justify-between text-xs text-teal-200/60">
+                <span>Palette: Teal-950 • Aqua • Mint</span>
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded-lg font-medium text-xs transition-colors ${
+                    currentTheme === 'ocean'
+                      ? 'bg-gradient-to-r from-cyan-400 to-teal-400 text-slate-950 font-bold'
+                      : 'bg-white/5 text-white/70 group-hover:text-white'
+                  }`}
+                >
+                  {currentTheme === 'ocean' ? 'Active Theme' : 'Select'}
                 </button>
               </div>
             </div>

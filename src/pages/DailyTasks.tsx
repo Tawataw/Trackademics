@@ -304,7 +304,7 @@ export function DailyTasks() {
                 id="add-daily-task-button"
                 type="submit"
                 disabled={!newTaskText.trim() || loading || addingTask}
-                className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-[var(--glow-primary)] border border-white/10 shrink-0"
+                className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-medium px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-[var(--glow-primary)] border border-white/10 shrink-0 cursor-pointer"
               >
                 <Plus className="w-5 h-5" />
                 <span className="hidden sm:inline text-sm font-semibold">Add</span>

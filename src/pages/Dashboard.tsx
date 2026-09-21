@@ -68,7 +68,7 @@ export function Dashboard() {
   );
   const displaySyllabusCompleted = Number.isInteger(overallCompleted) ? overallCompleted : Number(overallCompleted.toFixed(1));
 
-  const chartColor = currentTheme === 'emerald' ? '#10b981' : currentTheme === 'aurora' ? '#d946ef' : '#06b6d4';
+  const chartColor = currentTheme === 'emerald' ? '#10b981' : currentTheme === 'aurora' ? '#d946ef' : currentTheme === 'crimson' ? '#e11d48' : currentTheme === 'minimalist' ? '#ffffff' : currentTheme === 'cyberpunk' ? '#facc15' : currentTheme === 'ocean' ? '#2dd4bf' : '#06b6d4';
 
   const chartData = [...exams].reverse().map(e => ({
     name: `${e.class} ${e.examType}`,
@@ -95,7 +95,7 @@ export function Dashboard() {
         </div>
         <Link 
           to="/academic" 
-          className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 shadow-md shadow-[var(--glow-primary)] border border-white/10 transition-all px-4 py-2 rounded-xl flex items-center gap-2 font-medium w-fit text-white cursor-pointer"
+          className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 shadow-md shadow-[var(--glow-primary)] border border-white/10 transition-all px-4 py-2 rounded-xl flex items-center gap-2 font-medium w-fit text-primary-foreground cursor-pointer"
         >
           <Plus className="w-5 h-5" /> Add Exam Result
         </Link>

@@ -9,6 +9,7 @@
   --card-bg-solid: #0f172a;
   --accent-primary: #06b6d4;
   --accent-secondary: #3b82f6;
+  --primary-foreground: #ffffff;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --border-subtle: rgba(255, 255, 255, 0.1);
@@ -22,6 +23,7 @@
   --card-bg-solid: #171717;
   --accent-primary: #8b5cf6;
   --accent-secondary: #d946ef;
+  --primary-foreground: #ffffff;
   --text-main: #fafafa;
   --text-muted: #a3a3a3;
   --border-subtle: rgba(255, 255, 255, 0.12);
@@ -35,6 +37,7 @@
   --card-bg-solid: #18181b;
   --accent-primary: #10b981;
   --accent-secondary: #34d399;
+  --primary-foreground: #ffffff;
   --text-main: #f4f4f5;
   --text-muted: #a1a1aa;
   --border-subtle: rgba(255, 255, 255, 0.1);
@@ -48,10 +51,53 @@
   --card-bg-solid: #171717;
   --accent-primary: #e11d48;
   --accent-secondary: #f97316;
+  --primary-foreground: #ffffff;
   --text-main: #fafafa;
   --text-muted: #a3a3a3;
   --border-subtle: rgba(255, 255, 255, 0.12);
   --glow-primary: rgba(225, 29, 72, 0.25);
+}
+
+.theme-minimalist {
+  /* "Minimalist" Theme (pure black background, zinc-900/40 cards, solid pure white accents, distraction-free monochrome) */
+  --bg-main: #000000;
+  --card-bg: rgba(24, 24, 27, 0.4);
+  --card-bg-solid: #18181b;
+  --accent-primary: #ffffff;
+  --accent-secondary: #ffffff;
+  --primary-foreground: #000000;
+  --text-main: #ffffff;
+  --text-muted: #a1a1aa;
+  --border-subtle: rgba(255, 255, 255, 0.15);
+  --glow-primary: rgba(255, 255, 255, 0.15);
+}
+
+.theme-cyberpunk {
+  /* "Cyberpunk" Theme (very dark slate-950, slate-900/80 cards with slate-800 borders, neon yellow-400 & hot pink-500 accents) */
+  --bg-main: #020617;
+  --card-bg: rgba(15, 23, 42, 0.8);
+  --card-bg-solid: #0f172a;
+  --accent-primary: #facc15;
+  --accent-secondary: #ec4899;
+  --primary-foreground: #000000;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-subtle: rgba(30, 41, 59, 0.9);
+  --glow-primary: rgba(250, 204, 21, 0.35);
+}
+
+.theme-ocean {
+  /* "Ocean" Theme (deep teal-950/slate-950, soothing teal-900/30 glass cards with subtle teal borders, soft aqua/teal accents) */
+  --bg-main: #021a20;
+  --card-bg: rgba(13, 59, 66, 0.35);
+  --card-bg-solid: #042f2e;
+  --accent-primary: #22d3ee;
+  --accent-secondary: #2dd4bf;
+  --primary-foreground: #022c22;
+  --text-main: #f0fdfa;
+  --text-muted: #99f6e4;
+  --border-subtle: rgba(45, 212, 191, 0.2);
+  --glow-primary: rgba(34, 211, 238, 0.25);
 }
 
 @theme {
@@ -59,6 +105,7 @@
   --color-card-bg: var(--card-bg);
   --color-accent-primary: var(--accent-primary);
   --color-accent-secondary: var(--accent-secondary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-text-main: var(--text-main);
   --color-text-muted: var(--text-muted);
   --color-border-subtle: var(--border-subtle);
@@ -130,3 +177,40 @@
 .theme-crimson .border-white\/10 {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
+
+.theme-minimalist .bg-\[\#0f172a\] {
+  background-color: var(--bg-main) !important;
+}
+
+.theme-minimalist .bg-\[\#1e293b\] {
+  background-color: var(--card-bg-solid) !important;
+}
+
+.theme-minimalist .border-white\/10 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.theme-cyberpunk .bg-\[\#0f172a\] {
+  background-color: var(--bg-main) !important;
+}
+
+.theme-cyberpunk .bg-\[\#1e293b\] {
+  background-color: var(--card-bg-solid) !important;
+}
+
+.theme-cyberpunk .border-white\/10 {
+  border-color: rgba(30, 41, 59, 0.9) !important;
+}
+
+.theme-ocean .bg-\[\#0f172a\] {
+  background-color: var(--bg-main) !important;
+}
+
+.theme-ocean .bg-\[\#1e293b\] {
+  background-color: var(--card-bg-solid) !important;
+}
+
+.theme-ocean .border-white\/10 {
+  border-color: rgba(45, 212, 191, 0.2) !important;
+}
+

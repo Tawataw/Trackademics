@@ -239,7 +239,7 @@ export function StudyLab() {
           id="btn-add-subject"
           type="button"
           onClick={handleOpenModal}
-          className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10 cursor-pointer w-full sm:w-auto shrink-0"
+          className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-primary-foreground font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10 cursor-pointer w-full sm:w-auto shrink-0"
         >
           <Plus className="w-5 h-5" />
           <span>+ Add Subject</span>
@@ -264,7 +264,7 @@ export function StudyLab() {
           <button
             type="button"
             onClick={handleOpenModal}
-            className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-white font-semibold py-2.5 px-5 rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-[var(--glow-primary)] border border-white/10 cursor-pointer"
+            className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] transition-all text-primary-foreground font-semibold py-2.5 px-5 rounded-xl flex items-center gap-2 text-sm shadow-lg shadow-[var(--glow-primary)] border border-white/10 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Create First Subject</span>
@@ -397,7 +397,7 @@ export function StudyLab() {
                 <button
                   type="submit"
                   disabled={submitting || !subjectName.trim()}
-                  className="px-6 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-[var(--glow-primary)] border border-white/10 flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] text-primary-foreground font-bold rounded-xl text-sm transition-all shadow-lg shadow-[var(--glow-primary)] border border-white/10 flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <>
@@ -600,7 +600,7 @@ export function StudyLab() {
                 id="btn-begin-session"
                 type="button"
                 onClick={handleBeginSession}
-                className="flex-2 py-3 px-6 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-[var(--glow-primary)] border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-2 py-3 px-6 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 active:scale-[0.98] text-primary-foreground font-bold rounded-xl text-sm transition-all shadow-lg shadow-[var(--glow-primary)] border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" />
                 <span>Begin Session</span>

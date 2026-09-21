@@ -148,7 +148,7 @@ export function AcademicProgress() {
               setErrorMessage(null);
               setShowAddModal(true);
             }}
-            className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 border border-white/10 transition-all px-4 py-2.5 rounded-xl flex items-center gap-2 font-semibold shadow-lg shadow-[var(--glow-primary)] text-sm whitespace-nowrap cursor-pointer text-white"
+            className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 border border-white/10 transition-all px-4 py-2.5 rounded-xl flex items-center gap-2 font-semibold shadow-lg shadow-[var(--glow-primary)] text-sm whitespace-nowrap cursor-pointer text-primary-foreground"
           >
             <Plus className="w-4 h-4" /> Add Exam
           </button>
@@ -184,7 +184,7 @@ export function AcademicProgress() {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => setShowAddModal(true)}
-              className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer"
+              className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all text-primary-foreground px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer"
             >
               <Plus className="w-5 h-5" /> Add Exam Record
             </button>
@@ -375,7 +375,7 @@ export function AcademicProgress() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 disabled:opacity-50 px-5 py-2.5 rounded-xl text-white text-sm font-bold flex items-center gap-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all cursor-pointer"
+                  className="bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 disabled:opacity-50 px-5 py-2.5 rounded-xl text-primary-foreground text-sm font-bold flex items-center gap-2 shadow-lg shadow-[var(--glow-primary)] border border-white/10 transition-all cursor-pointer"
                 >
                   {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                   Save Exam to Cloud

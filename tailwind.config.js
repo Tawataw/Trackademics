@@ -11,6 +11,7 @@ export default {
         'card-bg': 'var(--card-bg)',
         'accent-primary': 'var(--accent-primary)',
         'accent-secondary': 'var(--accent-secondary)',
+        'primary-foreground': 'var(--primary-foreground)',
         'text-main': 'var(--text-main)',
         'text-muted': 'var(--text-muted)',
         'border-subtle': 'var(--border-subtle)',
@@ -22,6 +23,7 @@ export default {
       textColor: {
         main: 'var(--text-main)',
         muted: 'var(--text-muted)',
+        'primary-foreground': 'var(--primary-foreground)',
       },
       borderColor: {
         subtle: 'var(--border-subtle)',
